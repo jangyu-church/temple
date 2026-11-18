@@ -7,7 +7,14 @@
 <meta name="description" content="열왕기상 6–8장과 역대하 3–4장을 바탕으로 솔로몬 성전의 공간과 의미를 3D로 걸어 보는 교육용 복원 모형">
 <meta property="og:title" content="솔로몬 성전 산책">
 <meta property="og:description" content="성경 기록을 따라 솔로몬 성전을 3D로 걸어 봅니다.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%2313221f'/%3E%3Cpath d='M22 14v36M42 14v36' stroke='%23e5b96f' stroke-width='5'/%3E%3C/svg%3E">
+<link rel="icon" href="icons/favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="theme-color" content="#13221f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="성전 산책">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&family=Noto+Serif+KR:wght@600&display=swap" rel="stylesheet">
 <style>
@@ -133,6 +140,23 @@ th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;verti
 th{color:var(--gold);font-weight:600;font-size:13px}
 .muted{color:var(--muted)!important;font-size:13.5px!important}
 
+/* install */
+.installBtn{border-color:var(--gold-deep);color:var(--gold);background:transparent;font-size:14px;font-weight:600}
+.installBtn[hidden]{display:none}
+.installBar{position:fixed;left:12px;right:12px;bottom:12px;z-index:50;display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--gold-deep);border-radius:14px;background:#13221ff5;box-shadow:0 8px 30px #000a}
+.installBar[hidden]{display:none}
+.installBar img{border-radius:10px}
+.installBar div{flex:1;line-height:1.35}
+.installBar b{display:block;font-size:15px}
+.installBar small{font-size:12px;color:var(--muted)}
+.installBar .gold,#install .gold{background:var(--gold);color:var(--ink);border-color:var(--gold);font-weight:700}
+.installBar .x{border:0;background:transparent;font-size:22px;padding:4px 8px;color:var(--muted)}
+#install ol{padding-left:22px;margin:10px 0}
+#install li{margin:8px 0}
+#install .gold{width:100%;padding:13px;font-size:17px;margin:10px 0}
+#install .hint{padding:12px 14px;border-radius:10px;background:var(--panel2);font-size:14px}
+#install .key{display:inline-block;padding:0 7px;border:1px solid var(--line);border-radius:5px;background:#24393a;font-size:13px}
+
 /* responsive */
 @media (max-width:1100px){
   .topControls{max-width:62%}
@@ -155,18 +179,19 @@ th{color:var(--gold);font-weight:600;font-size:13px}
   .compass,.modelNote{display:none}
   .sceneNotes{left:16px;top:110px}
   #walkPad{right:10px;top:100px;bottom:auto;width:178px;padding:8px}
+  .headerActions .quiet{padding:6px 8px}
   footer{height:auto;padding:12px 16px;flex-direction:column;align-items:flex-start;gap:4px}
   dialog{padding:24px 20px}
 }
 
 </style>
-<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="importmap">{"imports":{"three":"./vendor/three.module.js","three/addons/controls/OrbitControls.js":"./vendor/OrbitControls.js","three/addons/environments/RoomEnvironment.js":"./vendor/RoomEnvironment.js"}}</script>
 </head>
 <body>
 <header>
   <a class="brand" href="./"><span class="brandmark">Ⅱ</span><span>성전 산책<small>TEMPLE EXPLORER</small></span></a>
   <div class="era"><span class="label">현재 시대</span><strong>솔로몬 성전</strong><span class="ver">첫 번째 성전</span></div>
-  <div class="headerActions"><button id="researchBtn" class="quiet">고증 자료</button><button id="helpBtn" class="quiet">이용 안내</button></div>
+  <div class="headerActions"><button id="installBtn" class="installBtn" hidden>앱으로 받기</button><button id="researchBtn" class="quiet">고증 자료</button><button id="helpBtn" class="quiet">이용 안내</button></div>
 </header>
 
 <main>
@@ -278,6 +303,20 @@ th{color:var(--gold);font-weight:600;font-size:13px}
   <h3>비교 자료에 대하여</h3>
   <p>성전 연구에서는 ‘현관–본당–안쪽 방’의 세 칸 구조를 가진 철기시대 북시리아 신전들(예: 아인 다라, 텔 타이낫)이 자주 비교됩니다. 이 모형은 그 신전들의 세부 모양을 옮기지 않았고, 세 칸 배치가 당시 지역에서 낯설지 않았다는 정도로만 참고했습니다. 그룹의 몸 모양, 기둥 머리의 세부, 제단의 오르는 방식 등은 본문만으로 정할 수 없어 ‘복원 가정’으로 표시했습니다.</p>
   <p class="muted">제2성전(스룹바벨)·헤롯 성전과 에스겔 40–43장의 환상 성전 구조는 섞지 않았습니다.</p>
+</dialog>
+
+<section id="installBar" class="installBar" hidden aria-label="앱 설치 안내">
+  <img src="icons/icon-192.png" alt="" width="44" height="44">
+  <div><b>앱으로 받아 두세요</b><small>홈 화면에서 바로 열립니다</small></div>
+  <button id="installBarBtn" class="gold">받기</button>
+  <button id="installBarClose" class="x" aria-label="닫기">×</button>
+</section>
+
+<dialog id="install">
+  <button class="close" data-close aria-label="닫기">×</button>
+  <span class="eyebrow">INSTALL APP</span>
+  <h2>성전 산책을 앱으로 받기</h2>
+  <div id="installBody"></div>
 </dialog>
 
 <script type="module">
@@ -467,6 +506,72 @@ document.querySelectorAll('[data-close]').forEach((b) => (b.onclick = () => b.cl
 document.querySelectorAll('dialog').forEach((d) => d.addEventListener('click', (e) => { if (e.target === d) d.close(); }));
 $('#prev').onclick = () => select((state.index - 1 + PLACES.length) % PLACES.length);
 $('#next').onclick = () => select((state.index + 1) % PLACES.length);
+
+/* ---------------- 앱 설치 (홈 화면에 추가) ---------------- */
+const ua = navigator.userAgent;
+const isIOS = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const isAndroid = /Android/.test(ua);
+const inApp = /KAKAOTALK|NAVER|Instagram|FBAN|FBAV|Line\//i.test(ua);
+const isStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+let deferredPrompt = null;
+const store = { get(k) { try { return localStorage.getItem('temple-' + k); } catch { return null; } }, set(k, v) { try { localStorage.setItem('temple-' + k, v); } catch {} } };
+
+function installHTML() {
+  if (deferredPrompt) return `<p>아래 단추를 누르면 바로 설치됩니다. 설치 후에는 홈 화면의 <b>성전 산책</b> 아이콘으로 열 수 있습니다.</p>
+    <button class="gold" data-act="prompt">홈 화면에 설치하기</button>`;
+  if (inApp) {
+    const url = location.href.split('#')[0];
+    return `<p>지금은 ${/KAKAOTALK/i.test(ua) ? '카카오톡' : '앱'} 안의 화면이라 설치할 수 없습니다.</p>
+      <ol><li>오른쪽 아래(또는 위)의 <span class="key">⋮</span> 또는 <span class="key">공유</span>를 누릅니다.</li>
+      <li><b>${isIOS ? '“Safari로 열기”' : '“다른 브라우저로 열기”(크롬)'}</b>를 누릅니다.</li>
+      <li>열린 화면에서 다시 <b>앱으로 받기</b>를 누릅니다.</li></ol>
+      <button class="gold" data-act="copy">주소 복사하기</button><p class="hint">${url}</p>`;
+  }
+  if (isIOS) return `<p>아이폰·아이패드는 <b>사파리</b>에서 설치합니다.</p>
+    <ol><li>화면 아래(또는 위)의 <span class="key">공유 ⬆︎</span> 단추를 누릅니다.</li>
+    <li>목록을 조금 내려 <b>“홈 화면에 추가”</b>를 누릅니다.</li>
+    <li>오른쪽 위 <b>“추가”</b>를 누르면 홈 화면에 성전 아이콘이 생깁니다.</li></ol>`;
+  if (isAndroid) return `<p>갤럭시 등 안드로이드 폰은 <b>크롬</b>에서 설치합니다.</p>
+    <ol><li>오른쪽 위 <span class="key">⋮</span> 메뉴를 누릅니다.</li>
+    <li><b>“홈 화면에 추가”</b> 또는 <b>“앱 설치”</b>를 누릅니다.</li>
+    <li><b>“설치”</b>를 누르면 홈 화면에 성전 아이콘이 생깁니다.</li></ol>
+    <p class="hint">삼성 인터넷에서는 아래쪽 <span class="key">≡</span> 메뉴 → <b>“현재 페이지 추가” → “홈 화면”</b>을 누르세요.</p>`;
+  return `<p>컴퓨터에서는 <b>크롬</b>이나 <b>엣지</b>에서 설치할 수 있습니다.</p>
+    <ol><li>주소창 오른쪽 끝의 <span class="key">설치 ⊕</span> 아이콘을 누릅니다.</li>
+    <li>(보이지 않으면) 오른쪽 위 <span class="key">⋮</span> → <b>“저장 및 공유” → “페이지를 앱으로 설치”</b>를 누릅니다.</li></ol>
+    <p class="hint">한 번 설치해 두면 인터넷이 약한 곳에서도 열립니다. 휴대폰에서 이 주소를 열면 같은 방법으로 받을 수 있습니다.</p>`;
+}
+function openInstall() {
+  $('#installBody').innerHTML = installHTML();
+  $('#install').showModal();
+}
+$('#installBody').addEventListener('click', async (e) => {
+  const act = e.target.dataset.act;
+  if (act === 'prompt' && deferredPrompt) {
+    deferredPrompt.prompt();
+    const r = await deferredPrompt.userChoice.catch(() => null);
+    deferredPrompt = null;
+    if (r && r.outcome === 'accepted') $('#install').close(); else $('#installBody').innerHTML = installHTML();
+  }
+  if (act === 'copy') {
+    try { await navigator.clipboard.writeText(location.href.split('#')[0]); e.target.textContent = '복사했습니다'; } catch { e.target.textContent = '아래 주소를 길게 눌러 복사하세요'; }
+  }
+});
+function refreshInstallUI() {
+  const show = !isStandalone();
+  $('#installBtn').hidden = !show;
+  const mobile = isIOS || isAndroid;
+  $('#installBar').hidden = !(show && mobile && !store.get('barClosed'));
+}
+$('#installBtn').onclick = openInstall;
+$('#installBarBtn').onclick = openInstall;
+$('#installBarClose').onclick = () => { store.set('barClosed', '1'); $('#installBar').hidden = true; };
+addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; refreshInstallUI(); });
+addEventListener('appinstalled', () => { deferredPrompt = null; store.set('barClosed', '1'); refreshInstallUI(); });
+refreshInstallUI();
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+}
 
 let onSelect = () => {};
 function select(i, instant = false) {
