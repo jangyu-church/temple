@@ -1,0 +1,1342 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>솔로몬 성전 산책</title>
+<meta name="description" content="열왕기상 6–8장과 역대하 3–4장을 바탕으로 솔로몬 성전의 공간과 의미를 3D로 걸어 보는 교육용 복원 모형">
+<meta property="og:title" content="솔로몬 성전 산책">
+<meta property="og:description" content="성경 기록을 따라 솔로몬 성전을 3D로 걸어 봅니다.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%2313221f'/%3E%3Cpath d='M22 14v36M42 14v36' stroke='%23e5b96f' stroke-width='5'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&family=Noto+Serif+KR:wght@600&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#13221f;--panel:#182a28;--panel2:#1f3331;--line:#33474a;--muted:#a1b3ae;
+  --text:#f3f0e6;--gold:#e5b96f;--gold-deep:#9d7f52;--ink:#14221f;
+  --tag-text:#7fc4a4;--tag-analogy:#8fb3e6;--tag-assume:#e6a07f;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text)}
+body{font:16px/1.7 "Pretendard","Noto Sans KR",system-ui,-apple-system,sans-serif;word-break:keep-all}
+button{font:inherit;color:inherit;cursor:pointer;border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:8px 14px;transition:border-color .15s,background .15s,color .15s}
+button:hover{border-color:var(--gold);background:#2a3c39}
+button:focus-visible,a:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+button[aria-pressed="true"],button.active{color:var(--gold);border-color:var(--gold-deep);background:#373b2e}
+a{color:var(--gold)}
+
+/* header */
+header{height:84px;padding:0 30px;display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:14px;color:var(--text);text-decoration:none;font-size:21px;font-weight:700;line-height:1.25}
+.brand small{display:block;font-size:10px;letter-spacing:3px;color:var(--muted);font-weight:600;margin-top:5px}
+.brandmark{width:40px;height:44px;border:1px solid var(--gold-deep);display:grid;place-items:center;color:var(--gold);font:30px Georgia,serif}
+.era{display:flex;align-items:center;gap:12px;font-size:14px}
+.era .label{color:var(--muted)}
+.era .ver{font-size:12px;padding:2px 10px;border:1px solid #5b6a58;border-radius:4px;color:#bfcdb1}
+.headerActions{display:flex;gap:6px}
+.quiet{border-color:transparent;background:transparent;color:var(--muted);font-size:14px}
+
+/* layout */
+main{display:grid;grid-template-columns:minmax(0,1fr) 380px;height:calc(100dvh - 84px - 48px);min-height:600px}
+.viewer{position:relative;overflow:hidden;background:#1d302d}
+.viewer::before,.viewer::after{content:"";position:absolute;left:0;right:0;pointer-events:none;z-index:0}
+.viewer::before{top:0;height:210px;background:linear-gradient(#0f1b19cc,#0f1b1900)}
+.viewer::after{bottom:0;height:200px;background:linear-gradient(#0f1b1900,#0f1b19c4)}
+.viewer>*:not(#scene){z-index:1}
+#scene,#markers{position:absolute;inset:0}
+#scene canvas{display:block;width:100%;height:100%;touch-action:none}
+#markers{pointer-events:none}
+.marker{position:absolute;transform:translate(-50%,-50%);pointer-events:auto;display:flex;align-items:center;gap:6px;padding:0;border:0;background:none}
+.marker .num{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;background:#14221fe0;color:#f5e1bd;border:1px solid #dcb679;box-shadow:0 2px 10px #0006}
+.marker .name{display:none;font-size:12px;padding:2px 8px;border-radius:5px;background:#14221fd8;color:#f5e9d2;white-space:nowrap}
+.showLabels .marker .name{display:block}
+.marker.selected .num{background:var(--gold);color:var(--ink);box-shadow:0 0 0 6px #e5b96f33}
+.marker:hover{background:none}
+.marker:hover .num{border-color:#fff}
+
+.sceneHeading{position:absolute;left:30px;top:26px;pointer-events:none}
+.eyebrow{color:var(--gold);font-size:11px;letter-spacing:2.4px;font-weight:700}
+.sceneHeading h1{text-shadow:0 1px 3px #0007;margin:8px 0 6px;font:600 38px/1.25 "Noto Serif KR",Georgia,serif;letter-spacing:-1px}
+.sceneHeading p{display:inline-block;margin:0;padding:2px 10px;border-radius:6px;font-size:14px;color:#dfe7e1;background:#14221fb8}
+.topControls{position:absolute;right:20px;top:24px;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:7px;max-width:56%}
+.topControls button{font-size:13px;background:#182a28e8;backdrop-filter:blur(4px)}
+.compass{position:absolute;left:26px;bottom:128px;font-size:12px;color:#e4ece4;letter-spacing:1px}
+.compass span{color:var(--gold);padding:0 10px}
+.modelNote{position:absolute;left:10px;top:42%;writing-mode:vertical-rl;font-size:10px;letter-spacing:1px;color:#88a199}
+.detailViews{position:absolute;left:50%;bottom:104px;transform:translateX(-50%);display:flex;align-items:center;gap:2px;padding:5px;border:1px solid #4d5f59;border-radius:10px;background:#12201ee8;white-space:nowrap}
+.detailViews span{font-size:10px;letter-spacing:1px;color:var(--gold);padding:0 8px}
+.detailViews button{font-size:14px;border-color:transparent;background:transparent;padding:6px 11px}
+.viewModes{position:absolute;left:50%;bottom:50px;transform:translateX(-50%);display:flex;gap:4px;padding:5px;border:1px solid #4d5f59;border-radius:10px;background:#12201ee8;white-space:nowrap}
+.viewModes button{border-color:transparent;background:transparent;font-size:14px}
+.viewModes button.active{background:var(--gold);color:var(--ink)}
+#gesture{position:absolute;bottom:20px;width:100%;text-align:center;margin:0;font-size:12px;color:#c4d3cc;pointer-events:none}
+#loading{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);padding:18px 26px;border:1px solid var(--gold-deep);border-radius:10px;background:#14221ff0;font-size:15px}
+#error{position:absolute;inset:auto 30px 50% 30px;padding:18px;border:1px solid #a66;border-radius:10px;background:#2a1d1df0}
+.sceneNotes{position:absolute;left:30px;top:150px;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.sceneNotes p{margin:0;font-size:12px;padding:4px 10px;border-radius:6px;background:#14221fd0;color:#e8d9bd;border-left:2px solid var(--gold)}
+
+/* walk pad */
+#walkPad{position:absolute;right:20px;bottom:150px;width:210px;padding:12px;border:1px solid #4d5f59;border-radius:12px;background:#12201ef0;display:flex;flex-direction:column;gap:10px;font-size:12px;user-select:none;-webkit-user-select:none}
+#walkPad[hidden]{display:none}
+#walkPad .grp{display:flex;flex-direction:column;align-items:center;gap:4px}
+#walkPad .grp>span{color:var(--gold);letter-spacing:1px}
+#walkPad .row{display:flex;gap:4px}
+#walkPad button{min-width:44px;padding:6px 8px;font-size:13px;touch-action:none}
+#walkPad p{margin:0;color:var(--muted);text-align:center;font-size:11px}
+
+/* aside */
+aside{display:flex;flex-direction:column;min-height:0;background:var(--panel);border-left:1px solid var(--line)}
+.asideTop{padding:22px 24px 16px;border-bottom:1px solid var(--line)}
+.routeTitle{display:flex;align-items:center;justify-content:space-between}
+.routeTitle h2{margin:6px 0 12px;font-size:23px}
+#count{font:12px ui-monospace,monospace;color:var(--muted)}
+#places{display:flex;flex-wrap:wrap;gap:6px}
+#places button{font-size:12.5px;padding:4px 10px;background:transparent;border-color:#405552}
+#places button.active{background:var(--gold);border-color:var(--gold);color:var(--ink)}
+#detail{flex:1;overflow:auto;padding:22px 24px 30px}
+.dNum{font:italic 36px/1 Georgia,serif;color:var(--gold)}
+#detail h2{margin:6px 0 2px;font-size:28px;line-height:1.35}
+.dEn{font-size:13px;letter-spacing:1px;color:var(--muted)}
+.metric{margin:18px 0;padding:12px 16px;border-left:3px solid var(--gold);background:var(--panel2);font-size:15px}
+#detail h3{margin:22px 0 6px;font-size:14px;color:var(--gold)}
+#detail p{margin:0 0 6px;font-size:15.5px;line-height:1.85;color:#e6e6dc}
+.refLink{display:inline-block;margin-top:6px;font-size:14px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.tag{font-size:12px;padding:2px 9px;border-radius:12px;border:1px solid}
+.tag.text{color:var(--tag-text);border-color:#3f7a62}
+.tag.analogy{color:var(--tag-analogy);border-color:#4b6690}
+.tag.assume{color:var(--tag-assume);border-color:#8a5a43}
+.note{font-size:13.5px!important;color:var(--muted)!important}
+.question{margin-top:20px;padding:14px 16px;border:1px dashed var(--gold-deep);border-radius:10px;font-size:15px}
+.question b{display:block;font-size:12px;color:var(--gold);letter-spacing:1px;margin-bottom:4px}
+.tourControls{display:flex;gap:8px;padding:14px 24px;border-top:1px solid var(--line)}
+#next{flex:1;display:flex;justify-content:space-between;align-items:center;background:var(--gold);color:var(--ink);border-color:var(--gold);font-weight:700;font-size:16px}
+#next:hover{background:#f0c985}
+
+/* footer */
+footer{height:48px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+footer b{color:var(--gold);font-weight:600;padding:0 10px}
+footer .future{color:#6f857f}
+
+/* dialogs */
+dialog{max-width:min(860px,calc(100vw - 24px));max-height:calc(100dvh - 40px);padding:34px 38px;border:1px solid var(--gold-deep);border-radius:14px;background:#172826;color:var(--text)}
+dialog::backdrop{background:#050b0ad0}
+dialog h2{margin:8px 0 14px;font:600 27px/1.35 "Noto Serif KR",Georgia,serif}
+dialog h3{margin:24px 0 6px;color:var(--gold);font-size:16px}
+dialog p,dialog li{font-size:15px;line-height:1.85;color:#dfe2d9}
+.close{position:sticky;top:0;float:right;margin:-14px -18px 0 0;width:38px;height:38px;padding:0;font-size:22px;line-height:1}
+.lead{font-size:16px!important}
+.tableScroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:620px}
+th,td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{color:var(--gold);font-weight:600;font-size:13px}
+.muted{color:var(--muted)!important;font-size:13.5px!important}
+
+/* responsive */
+@media (max-width:1100px){
+  .topControls{max-width:62%}
+  .topControls button{font-size:12px;padding:6px 10px}
+}
+@media (max-width:900px){
+  header{height:auto;padding:12px 16px;flex-wrap:wrap;gap:8px}
+  .era{order:3;width:100%;font-size:13px}
+  main{display:block;height:auto;min-height:0}
+  .viewer{height:72dvh;min-height:480px}
+  aside{border-left:0;border-top:1px solid var(--line)}
+  #detail{overflow:visible}
+  .sceneHeading{left:16px;top:14px}
+  .sceneHeading h1{font-size:26px}
+  .sceneHeading p{font-size:12px}
+  .topControls{left:16px;right:16px;top:auto;bottom:154px;max-width:none;justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px}
+  .topControls button{flex:none}
+  .detailViews{left:16px;right:16px;transform:none;bottom:98px;overflow-x:auto}
+  .viewModes{left:16px;right:16px;transform:none;bottom:46px;overflow-x:auto}
+  .compass,.modelNote{display:none}
+  .sceneNotes{left:16px;top:110px}
+  #walkPad{right:10px;top:100px;bottom:auto;width:178px;padding:8px}
+  footer{height:auto;padding:12px 16px;flex-direction:column;align-items:flex-start;gap:4px}
+  dialog{padding:24px 20px}
+}
+
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+</head>
+<body>
+<header>
+  <a class="brand" href="./"><span class="brandmark">Ⅱ</span><span>성전 산책<small>TEMPLE EXPLORER</small></span></a>
+  <div class="era"><span class="label">현재 시대</span><strong>솔로몬 성전</strong><span class="ver">첫 번째 성전</span></div>
+  <div class="headerActions"><button id="researchBtn" class="quiet">고증 자료</button><button id="helpBtn" class="quiet">이용 안내</button></div>
+</header>
+
+<main>
+  <section class="viewer" aria-label="성전 3차원 탐험">
+    <div id="scene"></div>
+    <div id="markers"></div>
+    <div class="sceneHeading">
+      <span class="eyebrow">01 / SOLOMON’S TEMPLE</span>
+      <h1>솔로몬 성전</h1>
+      <p>열왕기상 중심 복원 · 기원전 10세기</p>
+    </div>
+    <div class="topControls">
+      <button id="sectionBtn" aria-pressed="false">단면 보기</button>
+      <button id="labelBtn" aria-pressed="false">이름 표시</button>
+      <button id="renderBtn" aria-pressed="true">자연광 표현 켜짐</button>
+      <button id="lightBtn" aria-pressed="true">학습 조명 켜짐</button>
+      <button id="lampBtn" aria-pressed="false">등잔: 형태 미상</button>
+      <button id="fireBtn" aria-pressed="true">불·연기 켜짐</button>
+      <button id="compareBtn" aria-pressed="false">역대하 비교</button>
+    </div>
+    <div class="sceneNotes">
+      <p id="sectionNote" hidden>단면 관찰 · 지붕과 남쪽·동쪽 벽 일부를 숨긴 모습</p>
+      <p id="compareNote" hidden>역대하 비교 · 진설병 상 10개 (대하 4:8)</p>
+    </div>
+    <div class="compass">서 · 지성소 <span>↔</span> 동 · 입구</div>
+    <div class="modelNote">석회암 · 백향목 · 금 입힌 조각 · 놋 기물</div>
+    <div class="detailViews" role="group" aria-label="가까이 보기">
+      <span>가까이 보기</span>
+      <button data-view="altar">번제단</button>
+      <button data-view="entrance">성전 입구</button>
+      <button data-view="holy">성소 내부</button>
+      <button data-view="inner">지성소 내부</button>
+      <button data-view="relief">금빛 조각</button>
+    </div>
+    <div class="viewModes" role="group" aria-label="보기 방식">
+      <button id="orbitBtn" class="active">전체 모형</button>
+      <button id="planBtn">평면 보기</button>
+      <button id="walkBtn">직접 걷기</button>
+      <button id="resetBtn" aria-label="처음 시점으로">↺</button>
+    </div>
+    <div id="walkPad" hidden>
+      <div class="grp"><span>이동</span>
+        <button data-key="KeyW" aria-label="앞으로">↑</button>
+        <div class="row"><button data-key="KeyA" aria-label="왼쪽">←</button><button data-key="KeyS" aria-label="뒤로">↓</button><button data-key="KeyD" aria-label="오른쪽">→</button></div>
+      </div>
+      <div class="grp"><span>시선</span>
+        <button data-key="KeyR">위 ↑</button>
+        <div class="row"><button data-key="ArrowLeft" aria-label="왼쪽 보기">↶</button><button data-key="Home">정면</button><button data-key="ArrowRight" aria-label="오른쪽 보기">↷</button></div>
+        <button data-key="KeyF">아래 ↓</button>
+      </div>
+      <button id="mouseLookBtn" aria-pressed="false">마우스로 둘러보기</button>
+      <p>벽과 기물은 통과할 수 없습니다</p>
+    </div>
+    <div id="loading" role="status">성전 모형을 준비하고 있습니다…</div>
+    <div id="error" hidden>3D 화면을 불러오지 못했습니다. 최신 크롬·사파리·엣지에서 다시 열어 주세요. 오른쪽의 장소별 해설은 계속 읽을 수 있습니다.</div>
+    <p id="gesture">드래그로 회전 · 스크롤로 확대 · 번호를 눌러 탐험</p>
+  </section>
+
+  <aside>
+    <div class="asideTop">
+      <span class="eyebrow">EXPLORE THE SANCTUARY</span>
+      <div class="routeTitle"><h2>성전 안으로</h2><span id="count">01 / 10</span></div>
+      <nav id="places" aria-label="탐험 장소"></nav>
+    </div>
+    <article id="detail" aria-live="polite"></article>
+    <div class="tourControls">
+      <button id="prev" aria-label="이전 장소">←</button>
+      <button id="next">다음 장소 <span>→</span></button>
+    </div>
+  </aside>
+</main>
+
+<footer>
+  <span>열왕기상 6–8장 · 역대하 3–4장</span>
+  <span>시대별 탐험 <b>솔로몬</b><span class="future">스룹바벨 · 헤롯 — 추후 확장</span></span>
+</footer>
+
+<dialog id="help">
+  <button class="close" data-close aria-label="닫기">×</button>
+  <span class="eyebrow">HOW TO USE</span>
+  <h2>말씀을 따라 걷는 공간</h2>
+  <p>이 모형은 성경 본문을 읽을 때 공간을 떠올리도록 돕는 <b>교육용 개념 모형</b>입니다. 솔로몬 성전은 발굴로 확인된 유적이 없기 때문에, 본문에 적힌 치수를 바탕으로 하되 적히지 않은 부분은 합리적인 가정으로 채웠습니다.</p>
+  <h3>전체 모형</h3>
+  <p>마우스로 끌면 회전하고, 휠이나 두 손가락으로 확대합니다. 오른쪽 목록이나 화면의 번호를 누르면 그 장소로 시점이 이동하고 해설이 열립니다. 아래쪽 ‘가까이 보기’는 번제단·입구·성소·지성소·금빛 조각을 바로 보여 줍니다.</p>
+  <h3>직접 걷기</h3>
+  <p>W·A·S·D(또는 방향키 ↑↓)로 걷고, 화면을 끌거나 ‘마우스로 둘러보기’를 눌러 시선을 돌립니다. R·F는 위·아래 보기, Home은 정면 보기입니다. 휴대폰·태블릿에서는 화면 오른쪽의 이동·시선 버튼을 길게 누르세요. Shift를 누르면 빨리 걷습니다. 벽과 기물은 통과할 수 없습니다. 당시의 출입 규정(레 16장)을 재현하는 기능은 아닙니다.</p>
+  <h3>단면 보기와 평면 보기</h3>
+  <p>‘단면 보기’는 지붕과 남쪽·동쪽 벽, 남쪽 곁방의 바깥벽을 숨겨 내부를 보여 줍니다. 실제 건물이 열려 있었다는 뜻이 아니라 관찰을 위한 절단 표시입니다. ‘평면 보기’는 위에서 내려다본 배치도입니다.</p>
+  <h3>단추들</h3>
+  <p><b>역대하 비교</b> — 진설병 상을 1개(왕상 7:48)에서 10개(대하 4:8)로 바꿉니다. <b>등잔</b> — 등잔대의 가지 수는 본문에 없으므로 기본은 단순한 등잔으로 두고, 출애굽기 25장의 일곱 가지 형태와 비교할 수 있습니다. <b>학습 조명</b> — 창이 높고 작은 실내를 관찰하기 위한 보조 빛입니다. <b>자연광 표현</b> — 그림자와 금속 반사를 켜고 끕니다(느린 기기에서는 끄면 부드러워집니다).</p>
+  <h3>단위</h3>
+  <p>모형의 단위는 규빗입니다. 1규빗을 약 45cm로 보면 성전 본채 내부는 길이 약 27m, 너비 약 9m, 높이 약 13.5m입니다. 대하 3:3의 ‘옛날 자’를 긴 규빗(약 52cm)으로 보면 조금 더 커집니다.</p>
+</dialog>
+
+<dialog id="research">
+  <button class="close" data-close aria-label="닫기">×</button>
+  <span class="eyebrow">RECONSTRUCTION NOTES</span>
+  <h2>무엇이 기록되었고, 무엇을 채웠는가</h2>
+  <p class="lead">본문에 적힌 내용을 먼저 따르고, 적히지 않은 부분은 표시를 붙여 구분했습니다. 이 모형은 가능한 여러 복원안 가운데 하나입니다.</p>
+  <div class="tags"><span class="tag text">본문 명시</span><span class="tag analogy">비교 · 유추</span><span class="tag assume">복원 가정</span></div>
+  <p class="muted">‘본문 명시’는 성경에 기록되어 있다는 뜻이며, 고고학적으로 실물이 확인되었다는 뜻은 아닙니다.</p>
+  <h3>열왕기상과 역대하의 차이, 그리고 이 모형의 선택</h3>
+  <div class="tableScroll"><table>
+    <thead><tr><th>항목</th><th>열왕기상 · 예레미야</th><th>역대하</th><th>이 모형</th></tr></thead>
+    <tbody id="diffRows"></tbody>
+  </table></div>
+  <h3>참고한 본문</h3>
+  <ul id="sourceList"></ul>
+  <h3>비교 자료에 대하여</h3>
+  <p>성전 연구에서는 ‘현관–본당–안쪽 방’의 세 칸 구조를 가진 철기시대 북시리아 신전들(예: 아인 다라, 텔 타이낫)이 자주 비교됩니다. 이 모형은 그 신전들의 세부 모양을 옮기지 않았고, 세 칸 배치가 당시 지역에서 낯설지 않았다는 정도로만 참고했습니다. 그룹의 몸 모양, 기둥 머리의 세부, 제단의 오르는 방식 등은 본문만으로 정할 수 없어 ‘복원 가정’으로 표시했습니다.</p>
+  <p class="muted">제2성전(스룹바벨)·헤롯 성전과 에스겔 40–43장의 환상 성전 구조는 섞지 않았습니다.</p>
+</dialog>
+
+<script type="module">
+// 솔로몬 성전 산책 — 장소별 해설 데이터
+// 좌표 단위: 규빗. +x = 동쪽(입구), -x = 서쪽(지성소), +z = 남쪽, -z = 북쪽
+const PLACES = [
+{
+  id:'court', name:'뜰', en:'THE INNER COURT',
+  point:[92,2,-38], view:[125,72,118], look:[16,0,0], walk:[100,0,Math.PI/2], section:false,
+  metric:'다듬은 돌 세 켜 + 백향목 한 켜의 담 (왕상 6:36)',
+  body:'성전 본채를 둘러싼 안뜰입니다. 열왕기상은 안뜰의 담을 다듬은 돌 세 켜와 백향목 들보 한 켜로 쌓았다고 말하지만, 뜰의 넓이는 적지 않습니다. 이 모형의 뜰 크기와 출입문 위치는 탐험을 위해 정한 것입니다. 번제단, 놋 바다, 물두멍 수레가 모두 이 뜰에 놓였습니다.',
+  meaning:'봉헌 기도에서 솔로몬은 “하늘과 하늘들의 하늘이라도 주를 용납하지 못하겠거든 하물며 내가 건축한 이 성전이오리이까”(왕상 8:27)라고 고백합니다. 성전은 하나님을 가두는 집이 아니라, 백성이 이곳을 향해 기도할 때 하늘에서 들으시는 하나님을 만나는 자리였습니다.',
+  ref:'왕상 6:36; 8:22–30', search:'1 Kings 6:36; 1 Kings 8:22-30',
+  tags:[['text','안뜰 담의 재료'],['assume','뜰의 넓이 · 문 위치 · 포장']],
+  question:'나는 오늘 어디를 향해, 무엇을 기대하며 기도하고 있습니까?'
+},
+{
+  id:'altar', name:'번제단', en:'THE BRONZE ALTAR',
+  point:[70,14,0], view:[112,34,46], look:[70,5,0], walk:[96,4,Math.PI/2], section:false,
+  metric:'20 × 20 × 10규빗 (대하 4:1)',
+  body:'성전 앞 뜰에 놓인 놋 제단입니다. 열왕기상은 치수를 적지 않고, 역대하 4:1이 길이와 너비 20규빗, 높이 10규빗을 알려 줍니다. 봉헌 날에는 드릴 제물이 너무 많아 이 놋 제단이 작았으므로, 솔로몬이 뜰 가운데를 거룩하게 구별하여 번제를 드렸다고 기록합니다(왕상 8:64).',
+  meaning:'번제는 드리는 사람이 자신을 온전히 하나님께 맡긴다는 고백이었습니다. 성전에 들어가기 전에 가장 먼저 만나는 기물이 제단이라는 배치는, 하나님께 나아가는 길이 희생과 은혜에서 시작된다는 것을 보여 줍니다(히 10:19–20 참고).',
+  note:'출 20:26은 제단에 층계로 오르지 말라고 하고, 에스겔의 환상 제단(겔 43:17)은 동쪽을 향한 층계를 말합니다. 솔로몬 제단을 오르는 방식은 기록이 없어 남쪽 경사로로 표현했습니다.',
+  ref:'대하 4:1; 왕상 8:62–64', search:'2 Chronicles 4:1; 1 Kings 8:62-64',
+  tags:[['text','치수 (역대하)'],['assume','단 모양 · 네 뿔 · 경사로']],
+  question:'내가 하나님께 “온전히” 드리지 못하고 붙들고 있는 것은 무엇입니까?'
+},
+{
+  id:'sea', name:'놋 바다', en:'THE BRONZE SEA',
+  point:[50,11,30], view:[82,26,66], look:[50,4,30], walk:[64,44,Math.PI/4], section:false,
+  metric:'지름 10 · 높이 5 · 둘레 30규빗 / 소 12마리',
+  body:'놋으로 부어 만든 커다란 물그릇입니다. 가장자리는 백합화 모양이고, 그 아래에 박 모양 장식이 두 줄로 둘렸습니다. 열두 마리 소가 셋씩 북·서·남·동을 향해 서서 바다를 받쳤고, 소들의 뒤는 모두 안쪽을 향했습니다. 성전 오른쪽, 곧 동남쪽에 두었습니다. 역대하는 이 물이 제사장들이 씻기 위한 것이라고 설명합니다(대하 4:6).',
+  meaning:'하나님 앞에서 섬기는 사람은 먼저 씻어야 했습니다. 거룩함은 한 번의 의식으로 끝나지 않고 날마다 다시 씻김을 받는 삶입니다. 열두 마리 소를 이스라엘 열두 지파와 연결하는 해석도 있지만, 본문이 직접 그렇게 설명하지는 않습니다.',
+  note:'용량은 왕상 7:26이 2,000밧, 대하 4:5가 3,000밧으로 다르게 기록합니다. 소의 크기와 바다 밑의 높이는 모형을 위한 가정입니다.',
+  ref:'왕상 7:23–26, 39; 대하 4:2–6, 10', search:'1 Kings 7:23-26; 1 Kings 7:39; 2 Chronicles 4:2-6',
+  tags:[['text','치수 · 소 열둘 · 위치'],['assume','소의 크기 · 받침 높이']],
+  question:'나는 섬기기 전에, 말씀 앞에서 나 자신을 씻는 시간을 갖고 있습니까?'
+},
+{
+  id:'basins', name:'물두멍·받침 수레', en:'TEN BASINS ON STANDS',
+  point:[14,8,28], view:[22,24,66], look:[14,3,27], walk:[14,40,0], section:false,
+  metric:'받침 4 × 4 × 3규빗 · 바퀴 지름 1.5규빗 · 물두멍 40밧',
+  body:'놋 받침 수레 열 개 위에 물두멍을 하나씩 얹었습니다. 받침 옆판에는 사자와 소와 그룹, 그 사이에 화환 무늬가 있었고, 아래에는 병거 바퀴 같은 놋 바퀴 넷이 달렸습니다. 다섯은 성전 오른쪽(남쪽)에, 다섯은 왼쪽(북쪽)에 두었습니다. 역대하에 따르면 번제에 쓰는 것을 여기서 씻었습니다(대하 4:6).',
+  meaning:'받침에 바퀴가 달려 있다는 것은 물을 필요한 곳으로 옮길 수 있었다는 뜻입니다. 씻는 은혜는 한자리에 머물지 않고 섬김이 있는 자리마다 따라옵니다.',
+  note:'받침의 세부 구조(7:31–36)는 해석이 어려운 본문입니다. 열 개 받침의 간격은 모형을 위한 배치입니다.',
+  ref:'왕상 7:27–39; 대하 4:6', search:'1 Kings 7:27-39; 2 Chronicles 4:6',
+  tags:[['text','치수 · 수 · 좌우 배치'],['assume','받침 세부 · 간격']],
+  question:'오늘 내가 “옮겨 가야 할” 은혜의 자리는 어디입니까?'
+},
+{
+  id:'porch', name:'낭실·두 기둥', en:'THE PORCH · JACHIN & BOAZ',
+  point:[46,26,0], view:[96,22,34], look:[40,14,0], walk:[62,0,Math.PI/2], section:false,
+  metric:'낭실 20 × 10규빗 / 기둥 높이 18 · 둘레 12 · 머리 5규빗',
+  body:'성전 앞 현관인 낭실은 성전 너비를 따라 20규빗, 앞으로 10규빗입니다. 그 앞에 놋 기둥 둘을 세웠는데, 오른쪽(남쪽)을 야긴, 왼쪽(북쪽)을 보아스라 불렀습니다. 기둥 머리는 그물과 사슬 장식, 두 줄로 둘린 석류 이백 개, 백합화 모양으로 꾸몄습니다.',
+  meaning:'야긴(יָכִין)은 “그가 세우신다”는 뜻이고, 보아스(בֹּעַז)는 흔히 “그에게 능력이 있다”로 풀이됩니다(보아스의 정확한 뜻은 논의가 있습니다). 성전에 들어가는 사람은 이 두 이름 사이를 지나며, 성전을 세우시고 지키시는 분이 하나님이심을 기억했습니다.',
+  note:'역대하는 낭실 높이를 120규빗(대하 3:4), 기둥을 35규빗(3:15)으로 기록합니다. 기둥이 지붕을 받쳤는지 따로 서 있었는지는 본문만으로 정하기 어려워, 따로 선 기둥으로 표현했습니다.',
+  ref:'왕상 6:3; 7:15–22', search:'1 Kings 6:3; 1 Kings 7:15-22',
+  tags:[['text','치수 · 이름 · 좌우 위치'],['assume','낭실 높이 · 독립 기둥 · 기둥 머리 세부']],
+  question:'내 삶을 “세우시는” 분과 “지키시는” 힘을 나는 어디에서 찾고 있습니까?'
+},
+{
+  id:'holy', name:'성소', en:'THE HOLY PLACE · HEKHAL',
+  point:[14,24,0], view:[46,52,64], look:[8,8,0], walk:[27,0,Math.PI/2], section:true,
+  metric:'길이 40 · 너비 20 · 높이 30규빗',
+  body:'성소(외소)는 성전 본채의 앞쪽 40규빗입니다. 벽은 백향목 판으로 덮어 돌이 보이지 않게 했고, 그룹과 종려나무와 핀 꽃을 새겨 금으로 입혔습니다. 바닥에는 잣나무 판을 깔고 금으로 입혔습니다. 벽 높은 곳에 창이 있었고, 입구에는 잣나무 문 두 짝이 각각 두 쪽으로 접히게 달려 있었습니다.',
+  meaning:'돌 위에 나무를, 나무 위에 금을 입히고, 그 위에 나무와 꽃과 그룹을 새겼습니다. 이 장식에서 에덴 동산의 기억(창 2:9; 3:24)을 읽는 해석이 널리 알려져 있습니다. 성소는 잃어버린 하나님과의 동행을 다시 떠올리게 하는 공간이었습니다.',
+  note:'창의 개수와 정확한 위치, 벽 두께는 기록이 없어 가정했습니다.',
+  ref:'왕상 6:2–4, 15–18, 29–35', search:'1 Kings 6:2-4; 1 Kings 6:15-18; 1 Kings 6:29-35',
+  tags:[['text','치수 · 재료 · 조각 · 문'],['assume','창 위치 · 벽 두께']],
+  question:'내 일상의 “돌벽”은 지금 무엇으로 덮여 가고 있습니까?'
+},
+{
+  id:'lamps', name:'등잔대·상', en:'LAMPSTANDS & THE TABLE',
+  point:[4,7,9], view:[30,20,30], look:[6,3,0], walk:[22,0,Math.PI/2], section:true,
+  metric:'금 등잔대 10개 (오른쪽 5 · 왼쪽 5) / 진설병 상',
+  body:'내소 앞 오른쪽에 다섯, 왼쪽에 다섯, 모두 열 개의 순금 등잔대를 두었습니다. 열왕기상 7:48은 진설병을 두는 금 상을 하나로 말하고, 역대하 4:8은 상 열 개를 만들어 좌우에 다섯씩 두었다고 기록합니다. 등잔대의 가지 수는 본문에 적혀 있지 않습니다. 기본 화면은 단순한 등잔으로 두었고, ‘등잔’ 단추로 출애굽기 25장 성막 등잔대의 일곱 가지 형태와 비교할 수 있습니다.',
+  meaning:'진설병은 히브리어로 레헴 하파님(לֶחֶם הַפָּנִים), 곧 “얼굴의 떡”입니다. 하나님의 얼굴 앞에 늘 놓인 떡이었습니다. 예수님은 자신을 “생명의 떡”(요 6:35), “세상의 빛”(요 8:12)이라고 말씀하셨습니다.',
+  note:'등잔대의 높이와 형태, 상의 크기(출 25:23의 2 × 1 × 1.5규빗을 빌림)와 위치는 가정입니다.',
+  ref:'왕상 7:48–49; 대하 4:7–8, 19–20', search:'1 Kings 7:48-49; 2 Chronicles 4:7-8; 2 Chronicles 4:19-20',
+  tags:[['text','수 · 좌우 배치 · 재료'],['analogy','상 치수 (출 25장)'],['assume','등잔대 형태 · 높이']],
+  question:'하나님 앞에 “늘” 놓여 있어야 할 나의 떡과 등불은 무엇입니까?'
+},
+{
+  id:'incense', name:'금 제단·내소 문', en:'GOLDEN ALTAR & INNER DOORS',
+  point:[-6,6,0], view:[14,15,24], look:[-8,6,0], walk:[6,0,Math.PI/2], section:true,
+  metric:'분향하는 금 제단 · 감람나무 문 두 짝 · 금 사슬',
+  body:'내소 앞에는 백향목으로 만들고 금을 입힌 제단, 곧 분향하는 금 제단이 있었습니다(왕상 6:20–22; 7:48). 내소 입구에는 감람나무 문 두 짝을 달고 그룹과 종려나무와 핀 꽃을 새겨 금을 입혔습니다. 내소 앞을 금 사슬로 가로질렀고, 역대하는 청색·자색·홍색 실과 고운 베로 짠 휘장을 기록합니다(대하 3:14). 이 모형은 문과 휘장을 열어 둔 상태로 보여 줍니다.',
+  meaning:'향은 기도를 상징합니다(시 141:2; 계 8:3–4). 분향단이 지성소 바로 앞에 놓였다는 것은 하나님께 가장 가까이 나아가는 길이 기도임을 보여 줍니다. 예수님이 숨지실 때 성소의 휘장이 위로부터 아래까지 찢어졌습니다(마 27:51).',
+  note:'금 제단의 크기는 성막 분향단(출 30:2, 1 × 1 × 2규빗)을 빌렸습니다. 문의 크기, 휘장과 사슬의 위치는 가정입니다.',
+  ref:'왕상 6:20–22, 31–32; 7:48; 대하 3:14', search:'1 Kings 6:20-22; 1 Kings 6:31-32; 2 Chronicles 3:14',
+  tags:[['text','재료 · 조각 · 금 사슬 · 휘장(대하)'],['analogy','분향단 치수 (출 30장)'],['assume','문 크기 · 휘장 위치']],
+  question:'오늘 나의 기도는 하나님 앞에 어떤 향기로 올라가고 있습니까?'
+},
+{
+  id:'inner', name:'지성소·언약궤', en:'THE MOST HOLY PLACE · DEBIR',
+  point:[-20,13,0], view:[-4,46,44], look:[-20,4,0], walk:[-12,0,Math.PI/2], section:true,
+  metric:'20 × 20 × 20규빗 정육면체 · 그룹 높이 10 · 날개 각 5규빗',
+  body:'내소(지성소)는 길이·너비·높이가 모두 20규빗인 정육면체로, 순금으로 입혔습니다. 감람나무로 만든 두 그룹은 높이가 각각 10규빗이고, 날개는 각각 5규빗입니다. 한 그룹의 날개는 이쪽 벽에, 다른 그룹의 날개는 저쪽 벽에 닿고, 안쪽 날개는 방 가운데서 서로 닿았습니다. 그 날개 아래 언약궤를 두었는데, 궤 안에는 호렙에서 넣은 두 돌판 외에 아무것도 없었습니다(왕상 8:9). 채가 길어서 그 끝이 성소에서 보였습니다(8:8).',
+  meaning:'내소를 가리키는 히브리어 드비르(דְּבִיר)는 ‘말하다’(다바르)와 연결해 “말씀하시는 곳”으로 풀이되기도 하고, ‘뒤쪽 방’으로 보는 견해도 있습니다. 어느 쪽이든 이곳에는 신상이 아니라 말씀이 새겨진 돌판이 있었습니다. 봉헌 날 구름이 여호와의 성전에 가득하여 제사장들이 서서 섬기지 못했습니다(8:10–11).',
+  note:'그룹의 몸 모양과 얼굴은 본문에 없어 단순한 입상으로 표현했습니다. 그룹은 대하 3:13에 따라 성소 쪽(동쪽)을 향합니다. 궤의 치수는 출 25:10을 따랐습니다.',
+  ref:'왕상 6:16, 19–28; 8:6–11; 대하 3:8–13', search:'1 Kings 6:19-28; 1 Kings 8:6-11; 2 Chronicles 3:8-13',
+  tags:[['text','치수 · 그룹 크기와 배치 · 궤 안의 돌판'],['analogy','궤 치수 (출 25장)'],['assume','그룹의 몸 형태 · 바닥 높이']],
+  question:'내 삶의 가장 깊은 곳에는 무엇이 놓여 있습니까?'
+},
+{
+  id:'chambers', name:'곁방', en:'THE SIDE CHAMBERS',
+  point:[4,18,16], view:[30,40,80], look:[0,6,14], walk:[2,34,0], section:true,
+  metric:'아래층 5 · 가운데층 6 · 위층 7규빗 / 층 높이 5규빗',
+  body:'성소와 내소의 바깥 벽을 돌아가며 3층 곁방(골방)을 지었습니다. 성전 벽을 한 규빗씩 들여 턱을 만들어 들보가 성전 벽 속에 박히지 않게 했기 때문에, 위층으로 갈수록 방이 넓어집니다. 문은 성전 오른쪽(남쪽)에 있었고, 나선형 층계로 위층에 올랐습니다(6:8). 곁방의 쓰임은 본문에 자세히 나오지 않습니다.',
+  meaning:'6:7은 돌을 채석장에서 미리 다듬어 가져왔기 때문에, 건축하는 동안 성전에서 망치나 도끼나 쇠 연장 소리가 들리지 않았다고 말합니다. 하나님의 집은 소란이 아니라 준비된 순종으로 세워졌습니다.',
+  note:'방의 개수와 칸막이, 층계의 위치, 곁방 전체의 높이는 가정입니다. 단면 보기에서 남쪽 곁방의 바깥벽을 걷어 층별 너비 차이를 볼 수 있습니다.',
+  ref:'왕상 6:5–10', search:'1 Kings 6:5-10',
+  tags:[['text','층별 너비 · 층 높이 · 벽의 턱 · 문 위치'],['assume','방 개수 · 층계 위치']],
+  question:'보이지 않는 곳에서 미리 “다듬어지는” 시간이 내게 있습니까?'
+}];
+
+const CLOSEUPS = {
+  altar:   {pos:[96,16,22],  look:[70,8,0],   section:false},
+  entrance:{pos:[70,9,6],    look:[38,13,0],  section:false},
+  holy:    {pos:[27,6,4],    look:[-6,7,0],   section:false},
+  inner:   {pos:[-11.2,5.5,0], look:[-26,6.5,0], section:false},
+  relief:  {pos:[12,9,-3.5], look:[12,9,-10], section:false}
+};
+
+const DIFFS = [
+  ['낭실 높이','기록 없음 (왕상 6:3)','120규빗 (대하 3:4)','본채와 같은 30규빗으로 가정'],
+  ['두 기둥 높이','18규빗 (왕상 7:15; 렘 52:21)','35규빗 (대하 3:15)','18규빗'],
+  ['기둥 머리 높이','5규빗 (왕상 7:16; 렘 52:22) · 3규빗 (왕하 25:17)','—','5규빗'],
+  ['놋 바다 용량','2,000밧 (왕상 7:26)','3,000밧 (대하 4:5)','치수만 적용, 용량은 표시하지 않음'],
+  ['번제단 치수','언급만 있음 (왕상 8:64)','20 × 20 × 10규빗 (대하 4:1)','역대하 치수 적용'],
+  ['진설병 상','금 상 (왕상 7:48)','상 열 개 (대하 4:8)','기본 1개 · ‘역대하 비교’로 10개'],
+  ['내소 입구','감람나무 문 두 짝 (왕상 6:31–32)','휘장 (대하 3:14)','문과 휘장 모두 표시, 열어 둔 상태'],
+  ['규빗 기준','명시 없음','“옛날에 쓰던 자” (대하 3:3)','1규빗 ≈ 45cm (긴 규빗 ≈ 52cm 대안)'],
+  ['내소 높이','내부 20규빗 (왕상 6:20), 본채 30규빗 (6:2)','—','바닥은 같게, 천장을 낮추고 위에 빈 공간을 둔 해석']
+];
+
+const SOURCES = [
+  '열왕기상 5–8장 — 건축 준비, 본채·곁방·기물, 봉헌 (모형의 기준 본문)',
+  '역대하 2–5장 — 대조 기록 (번제단 치수, 휘장, 상 열 개 등)',
+  '열왕기하 25:13–17; 예레미야 52:17–23 — 바벨론이 놋 기물을 가져간 기록 (기둥 치수 대조)',
+  '출애굽기 25–30장 — 성막 기물 (궤·상·분향단 치수를 빌릴 때만 사용, ‘비교 · 유추’로 표시)',
+  '레위기 16장 — 대속죄일 지성소 출입 규정 (모형은 학습을 위해 자유롭게 걷도록 함)',
+  '에스겔 40–43장 — 환상 성전 (참고만 하고 모형에는 섞지 않음)'
+];
+
+
+const $ = (s) => document.querySelector(s);
+const state = { index: 0, mode: 'orbit', section: false, labels: false, natural: true, study: true, seven: false, fire: true, compare: false };
+
+/* ---------------- 해설 패널 (WebGL과 무관하게 항상 동작) ---------------- */
+const nav = $('#places');
+PLACES.forEach((p, i) => {
+  const b = document.createElement('button');
+  b.textContent = p.name;
+  b.addEventListener('click', () => select(i));
+  nav.appendChild(b);
+});
+const esc = (s) => s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+const tagName = { text: '본문 명시', analogy: '비교 · 유추', assume: '복원 가정' };
+
+function renderDetail() {
+  const p = PLACES[state.index];
+  const n = String(state.index + 1).padStart(2, '0');
+  $('#count').textContent = `${n} / ${String(PLACES.length).padStart(2, '0')}`;
+  [...nav.children].forEach((b, i) => b.classList.toggle('active', i === state.index));
+  const link = `https://www.biblegateway.com/passage/?search=${encodeURIComponent(p.search)}&version=KLB`;
+  $('#detail').innerHTML = `
+    <div class="dNum">${n}</div>
+    <h2>${esc(p.name)}</h2>
+    <div class="dEn">${p.en}</div>
+    <div class="metric">${esc(p.metric)}</div>
+    <h3>구조와 쓰임</h3><p>${esc(p.body)}</p>
+    <a class="refLink" href="${link}" target="_blank" rel="noopener">${esc(p.ref)} ↗</a>
+    <h3>말씀의 의미</h3><p>${esc(p.meaning)}</p>
+    ${p.note ? `<h3>복원 메모</h3><p class="note">${esc(p.note)}</p>` : ''}
+    <div class="tags">${p.tags.map(([t, s]) => `<span class="tag ${t}">${tagName[t]} · ${esc(s)}</span>`).join('')}</div>
+    <div class="question"><b>묵상 질문</b>${esc(p.question)}</div>`;
+  $('#detail').scrollTop = 0;
+  $('#next').firstChild.textContent = state.index === PLACES.length - 1 ? '처음으로 ' : '다음 장소 ';
+}
+
+$('#diffRows').innerHTML = DIFFS.map((r) => `<tr>${r.map((c) => `<td>${esc(c)}</td>`).join('')}</tr>`).join('');
+$('#sourceList').innerHTML = SOURCES.map((s) => `<li>${esc(s)}</li>`).join('');
+$('#helpBtn').onclick = () => $('#help').showModal();
+$('#researchBtn').onclick = () => $('#research').showModal();
+document.querySelectorAll('[data-close]').forEach((b) => (b.onclick = () => b.closest('dialog').close()));
+document.querySelectorAll('dialog').forEach((d) => d.addEventListener('click', (e) => { if (e.target === d) d.close(); }));
+$('#prev').onclick = () => select((state.index - 1 + PLACES.length) % PLACES.length);
+$('#next').onclick = () => select((state.index + 1) % PLACES.length);
+
+let onSelect = () => {};
+function select(i, instant = false) {
+  state.index = i;
+  renderDetail();
+  onSelect(PLACES[i], instant);
+}
+renderDetail();
+
+/* ---------------- 3D ---------------- */
+let THREE, OrbitControls, RoomEnvironment;
+try {
+  THREE = await import('three');
+  ({ OrbitControls } = await import('three/addons/controls/OrbitControls.js'));
+  ({ RoomEnvironment } = await import('three/addons/environments/RoomEnvironment.js'));
+  start();
+} catch (err) {
+  console.error(err);
+  $('#loading').hidden = true;
+  $('#error').hidden = false;
+}
+
+function start() {
+  const host = $('#scene');
+  const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 0.82;
+  host.appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 2000);
+  camera.position.set(125, 72, 118);
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.target.set(20, 0, 0);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.minDistance = 4;
+  controls.maxDistance = 420;
+  controls.maxPolarAngle = Math.PI / 2 - 0.03;
+
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  const envTex = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  scene.environment = envTex;
+
+  /* ---------- 하늘 ---------- */
+  {
+    const c = document.createElement('canvas'); c.width = 4; c.height = 512;
+    const g = c.getContext('2d'); const gr = g.createLinearGradient(0, 0, 0, 512);
+    gr.addColorStop(0, '#6f9bb4'); gr.addColorStop(0.55, '#c9d6d0'); gr.addColorStop(1, '#efdcb8');
+    g.fillStyle = gr; g.fillRect(0, 0, 4, 512);
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+    scene.background = t;
+    scene.fog = new THREE.Fog(0xe6d8bd, 320, 900);
+  }
+
+  /* ---------- 절차적 텍스처 ---------- */
+  const rnd = (() => { let s = 7; return () => ((s = (s * 16807) % 2147483647) / 2147483647); })();
+  function canvas(w, h, draw) {
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    draw(c.getContext('2d'), w, h); return c;
+  }
+  function noise(g, w, h, n, a, light = '#fff', dark = '#000') {
+    for (let i = 0; i < n; i++) {
+      g.globalAlpha = rnd() * a; g.fillStyle = rnd() > 0.5 ? light : dark;
+      const s = rnd() * 2.2 + 0.4; g.fillRect(rnd() * w, rnd() * h, s, s);
+    }
+    g.globalAlpha = 1;
+  }
+  function tex(c, tile, color = true) {
+    const t = new THREE.CanvasTexture(c);
+    t.wrapS = t.wrapT = THREE.RepeatWrapping;
+    t.repeat.set(1 / tile, 1 / tile);
+    t.anisotropy = 8;
+    if (color) t.colorSpace = THREE.SRGBColorSpace;
+    return t;
+  }
+
+  const stoneC = canvas(512, 512, (g, w, h) => {
+    g.fillStyle = '#cdbf9f'; g.fillRect(0, 0, w, h);
+    const rows = 4, rh = h / rows;
+    for (let r = 0; r < rows; r++) {
+      const off = r % 2 ? w / 4 : 0;
+      for (let k = -1; k < 3; k++) {
+        const x = off + k * (w / 2);
+        const l = 196 + rnd() * 30, tint = rnd() * 14;
+        g.fillStyle = `rgb(${l + 8},${l - 2 - tint * .3},${l - 30 - tint})`;
+        g.fillRect(x + 3, r * rh + 3, w / 2 - 6, rh - 6);
+        g.strokeStyle = 'rgba(255,250,235,.35)'; g.lineWidth = 2;
+        g.strokeRect(x + 6, r * rh + 6, w / 2 - 12, rh - 12);
+      }
+    }
+    noise(g, w, h, 9000, 0.18, '#fff8e8', '#6b5a3d');
+  });
+  const stoneBump = canvas(512, 512, (g, w, h) => {
+    g.fillStyle = '#fff'; g.fillRect(0, 0, w, h);
+    const rows = 4, rh = h / rows; g.fillStyle = '#000';
+    for (let r = 0; r <= rows; r++) g.fillRect(0, r * rh - 3, w, 6);
+    for (let r = 0; r < rows; r++) { const off = r % 2 ? w / 4 : 0; for (let k = -1; k < 3; k++) g.fillRect(off + k * (w / 2) - 3, r * rh, 6, rh); }
+    noise(g, w, h, 6000, 0.25, '#ddd', '#888');
+  });
+
+  const cedarC = canvas(512, 512, (g, w, h) => {
+    const n = 6, pw = w / n;
+    for (let i = 0; i < n; i++) {
+      const b = 110 + rnd() * 30;
+      g.fillStyle = `rgb(${b + 40},${b - 10},${b - 55})`; g.fillRect(i * pw, 0, pw, h);
+      for (let k = 0; k < 26; k++) {
+        g.strokeStyle = `rgba(60,28,12,${0.12 + rnd() * 0.2})`; g.lineWidth = 0.6 + rnd() * 1.4;
+        g.beginPath(); const x0 = i * pw + rnd() * pw; g.moveTo(x0, 0);
+        for (let y = 0; y <= h; y += 32) g.lineTo(x0 + Math.sin(y / 60 + k) * 4, y);
+        g.stroke();
+      }
+      g.fillStyle = 'rgba(30,14,6,.55)'; g.fillRect(i * pw, 0, 2, h);
+    }
+  });
+
+  const floorC = canvas(512, 512, (g, w, h) => {
+    const n = 8, ph = h / n;
+    for (let i = 0; i < n; i++) {
+      const b = 175 + rnd() * 25;
+      g.fillStyle = `rgb(${b + 30},${b},${b - 80})`; g.fillRect(0, i * ph, w, ph);
+      for (let k = 0; k < 10; k++) { g.strokeStyle = `rgba(110,70,20,${0.1 + rnd() * .15})`; g.beginPath(); const y = i * ph + rnd() * ph; g.moveTo(0, y); g.bezierCurveTo(w / 3, y + 4, w * 2 / 3, y - 4, w, y); g.stroke(); }
+      g.fillStyle = 'rgba(80,50,10,.5)'; g.fillRect(0, i * ph, w, 2);
+      g.fillRect((i % 2 ? w / 2 : 0) + rnd() * 30, i * ph, 2, ph);
+    }
+  });
+
+  function motifs(g, w, h, ink, hi) {
+    // 위·아래 핀 꽃 띠, 가운데 종려나무와 그룹 (왕상 6:29)
+    const band = (y) => {
+      for (let x = 32; x < w; x += 64) {
+        g.strokeStyle = ink; g.lineWidth = 3;
+        for (let p = 0; p < 8; p++) { const a = p * Math.PI / 4; g.beginPath(); g.ellipse(x + Math.cos(a) * 11, y + Math.sin(a) * 11, 9, 5, a, 0, Math.PI * 2); g.stroke(); }
+        g.fillStyle = ink; g.beginPath(); g.arc(x, y, 5, 0, 7); g.fill();
+      }
+      g.fillStyle = ink; g.fillRect(0, y - 28, w, 3); g.fillRect(0, y + 26, w, 3);
+    };
+    band(34); band(h - 34);
+    const palm = (x) => {
+      g.strokeStyle = ink; g.lineWidth = 9; g.beginPath(); g.moveTo(x, h - 70); g.quadraticCurveTo(x - 6, h / 2, x, 150); g.stroke();
+      g.lineWidth = 2; for (let y = 160; y < h - 75; y += 14) { g.beginPath(); g.moveTo(x - 6, y); g.lineTo(x + 6, y + 5); g.stroke(); }
+      g.lineWidth = 4;
+      for (let k = 0; k < 9; k++) {
+        const a = Math.PI + k * Math.PI / 8; const L = 70 + (k % 2) * 12;
+        g.beginPath(); g.moveTo(x, 150); g.quadraticCurveTo(x + Math.cos(a) * L * .6, 150 + Math.sin(a) * L * .6 - 20, x + Math.cos(a) * L, 150 + Math.sin(a) * L * .4 + 26); g.stroke();
+      }
+      g.fillStyle = hi; for (let k = -1; k <= 1; k += 2) { g.beginPath(); g.arc(x + k * 10, 168, 6, 0, 7); g.fill(); }
+    };
+    const cherub = (x) => {
+      const y = h / 2 + 10;
+      g.strokeStyle = ink; g.fillStyle = ink; g.lineWidth = 4;
+      g.beginPath(); g.arc(x, y - 70, 16, 0, 7); g.stroke();
+      g.beginPath(); g.moveTo(x - 16, y - 46); g.lineTo(x + 16, y - 46); g.lineTo(x + 24, y + 70); g.lineTo(x - 24, y + 70); g.closePath(); g.stroke();
+      for (const s of [-1, 1]) {
+        g.beginPath(); g.moveTo(x + s * 14, y - 40);
+        g.quadraticCurveTo(x + s * 70, y - 100, x + s * 92, y - 60);
+        g.quadraticCurveTo(x + s * 70, y - 10, x + s * 22, y + 10); g.stroke();
+        for (let f = 0; f < 4; f++) { g.beginPath(); g.moveTo(x + s * (30 + f * 14), y - 58 + f * 6); g.lineTo(x + s * (40 + f * 14), y - 22 + f * 4); g.stroke(); }
+      }
+      g.lineWidth = 2; for (let k = 0; k < 5; k++) { g.beginPath(); g.moveTo(x - 18 + k * 2, y - 30 + k * 20); g.lineTo(x + 18 - k * 2, y - 30 + k * 20); g.stroke(); }
+    };
+    palm(w * 0.25); palm(w * 0.75); cherub(w * 0.5); cherub(0); cherub(w);
+  }
+  const reliefC = canvas(1024, 512, (g, w, h) => {
+    const gr = g.createLinearGradient(0, 0, w, h);
+    gr.addColorStop(0, '#d9a94e'); gr.addColorStop(.5, '#f2cf7c'); gr.addColorStop(1, '#c9953c');
+    g.fillStyle = gr; g.fillRect(0, 0, w, h);
+    noise(g, w, h, 12000, 0.12, '#fff2c0', '#7a5414');
+    motifs(g, w, h, 'rgba(110,70,15,.85)', 'rgba(255,240,190,.9)');
+  });
+  const reliefBump = canvas(1024, 512, (g, w, h) => {
+    g.fillStyle = '#444'; g.fillRect(0, 0, w, h);
+    motifs(g, w, h, '#fff', '#fff');
+  });
+
+  const bronzeC = canvas(256, 256, (g, w, h) => {
+    g.fillStyle = '#8a5a2b'; g.fillRect(0, 0, w, h);
+    noise(g, w, h, 5000, 0.3, '#c58a4a', '#3a2412');
+    for (let i = 0; i < 30; i++) { g.globalAlpha = .12; g.fillStyle = '#4f8a6c'; g.beginPath(); g.arc(rnd() * w, rnd() * h, rnd() * 18, 0, 7); g.fill(); }
+    g.globalAlpha = 1;
+  });
+  const sootC = canvas(256, 256, (g, w, h) => {
+    const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#2a1a10'); gr.addColorStop(.35, '#6e4522'); gr.addColorStop(1, '#8a5a2b');
+    g.fillStyle = gr; g.fillRect(0, 0, w, h); noise(g, w, h, 5000, .3, '#b9834a', '#140b05');
+    g.strokeStyle = 'rgba(30,18,8,.6)'; g.lineWidth = 2; for (let y = 0; y < h; y += 32) { g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); }
+    for (let x = 0; x < w; x += 64) for (let y = 0; y < h; y += 32) { g.fillStyle = '#2b1b0d'; g.beginPath(); g.arc(x + 6, y + 6, 2.5, 0, 7); g.fill(); }
+  });
+  const pavingC = canvas(512, 512, (g, w, h) => {
+    g.fillStyle = '#b9ab8c'; g.fillRect(0, 0, w, h);
+    const n = 4, s = w / n;
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+      const l = 160 + rnd() * 26; g.fillStyle = `rgb(${l},${l - 10},${l - 34})`;
+      g.fillRect(i * s + 2 + (j % 2) * 0, j * s + 2, s - 4, s - 4);
+    }
+    noise(g, w, h, 9000, .15, '#fff', '#5b4b30');
+  });
+  const sandC = canvas(256, 256, (g, w, h) => { g.fillStyle = '#a8916a'; g.fillRect(0, 0, w, h); noise(g, w, h, 8000, .25, '#d8c59c', '#5d4b30'); });
+  const veilC = canvas(256, 512, (g, w, h) => {
+    const cols = ['#2c3f8f', '#6a2d6f', '#9c2430', '#efe7d6'];
+    for (let x = 0; x < w; x += 16) { g.fillStyle = cols[(x / 16) % 4]; g.fillRect(x, 0, 16, h); }
+    g.globalAlpha = .35; g.fillStyle = '#e8c56a';
+    for (let y = 80; y < h; y += 160) { g.beginPath(); g.ellipse(w / 2, y, 50, 22, 0, 0, 7); g.fill(); g.beginPath(); g.arc(w / 2, y - 28, 12, 0, 7); g.fill(); }
+    g.globalAlpha = 1;
+    for (let x = 0; x < w; x += 32) { const gr = g.createLinearGradient(x, 0, x + 32, 0); gr.addColorStop(0, 'rgba(0,0,0,.35)'); gr.addColorStop(.5, 'rgba(255,255,255,.08)'); gr.addColorStop(1, 'rgba(0,0,0,.35)'); g.fillStyle = gr; g.fillRect(x, 0, 32, h); }
+  });
+
+  /* ---------- 재질 ---------- */
+  const std = (o) => new THREE.MeshStandardMaterial(o);
+  const M = {
+    stone: std({ map: tex(stoneC, 6), bumpMap: tex(stoneBump, 6, false), bumpScale: 1.2, roughness: .9, color: 0xe2d6c0 }),
+    stoneDark: std({ map: tex(stoneC, 6), roughness: .95, color: 0xcfc3ad }),
+    cedar: std({ map: tex(cedarC, 6), roughness: .7 }),
+    relief: std({ map: tex(reliefC, 12), bumpMap: tex(reliefBump, 12, false), bumpScale: 2.5, metalness: .85, roughness: .35, color: 0xffffff }),
+    gold: std({ color: 0xe9b54f, metalness: 1, roughness: .28 }),
+    goldFloor: std({ map: tex(floorC, 8), metalness: .55, roughness: .42 }),
+    bronze: std({ map: tex(bronzeC, 4), metalness: .8, roughness: .48, color: 0xffe0c0 }),
+    altar: std({ map: tex(sootC, 5), metalness: .55, roughness: .7 }),
+    ash: std({ color: 0x2b2420, roughness: 1, emissive: 0x401204, emissiveIntensity: .6 }),
+    paving: std({ map: tex(pavingC, 10), roughness: .95 }),
+    sand: std({ map: tex(sandC, 14), roughness: 1 }),
+    water: std({ color: 0x5c8ca0, metalness: .1, roughness: .08, transparent: true, opacity: .85 }),
+    veil: std({ map: tex(veilC, 1), roughness: .9, side: THREE.DoubleSide }),
+    bread: std({ color: 0xc9914f, roughness: .9 }),
+    stoneTablet: std({ color: 0x8f8a80, roughness: .9 })
+  };
+  M.veil.map.repeat.set(1, 1);
+  M.relief.map.repeat.set(1 / 18, 1 / 9); M.relief.bumpMap.repeat.set(1 / 18, 1 / 9);
+
+  /* ---------- 기하 도우미 ---------- */
+  const world = new THREE.Group(); scene.add(world);
+  const colliders = [];        // 걷기 충돌용 상자
+  const sectionObjs = [];      // 단면 보기에서 숨길 것
+  const roofObjs = [];         // 평면 보기에서 숨길 것
+
+  function boxGeo(x0, x1, y0, y1, z0, z1) {
+    const g = new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0);
+    g.translate((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2);
+    // 월드 좌표 기반 UV → 이음매 없이 반복
+    const p = g.attributes.position, n = g.attributes.normal, uv = g.attributes.uv;
+    for (let i = 0; i < p.count; i++) {
+      const ax = Math.abs(n.getX(i)), ay = Math.abs(n.getY(i));
+      if (ax > .5) uv.setXY(i, p.getZ(i) * Math.sign(n.getX(i)), p.getY(i));
+      else if (ay > .5) uv.setXY(i, p.getX(i), p.getZ(i));
+      else uv.setXY(i, p.getX(i) * -Math.sign(n.getZ(i)) * -1, p.getY(i));
+    }
+    return g;
+  }
+  function flags(m, f = {}) {
+    m.castShadow = f.cast !== false; m.receiveShadow = true;
+    if (f.collide) colliders.push(m);
+    if (f.section) sectionObjs.push(m);
+    if (f.roof) roofObjs.push(m);
+    return m;
+  }
+  function B(x0, x1, y0, y1, z0, z1, mat, f = {}, parent = world) {
+    const m = new THREE.Mesh(boxGeo(x0, x1, y0, y1, z0, z1), mat);
+    parent.add(m); return flags(m, f);
+  }
+  function mesh(geo, mat, x, y, z, f = {}, parent = world) {
+    const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); parent.add(m); return flags(m, f);
+  }
+  // 개구부가 있는 벽: [u0,u1]×[0,H] 영역에서 구멍들을 빼고 직사각형 조각을 돌려줌
+  function wallPieces(u0, u1, y0, y1, holes) {
+    const cuts = new Set([u0, u1]);
+    holes.forEach((h) => { cuts.add(Math.max(u0, h[0])); cuts.add(Math.min(u1, h[1])); });
+    const xs = [...cuts].sort((a, b) => a - b); const out = [];
+    for (let i = 0; i < xs.length - 1; i++) {
+      const a = xs[i], b = xs[i + 1]; if (b - a < 1e-4) continue;
+      const hs = holes.filter((h) => h[0] < b - 1e-4 && h[1] > a + 1e-4).map((h) => [h[2], h[3]]).sort((p, q) => p[0] - q[0]);
+      let y = y0;
+      hs.forEach(([ha, hb]) => { if (ha > y) out.push([a, b, y, ha]); y = Math.max(y, hb); });
+      if (y < y1) out.push([a, b, y, y1]);
+    }
+    return out;
+  }
+  // 면별 재질 배열 [px,nx,py,ny,pz,nz]
+  const faces = (def, map) => ['px', 'nx', 'py', 'ny', 'pz', 'nz'].map((k) => map[k] || def);
+
+  /* ---------- 땅과 뜰 ---------- */
+  mesh(new THREE.PlaneGeometry(1600, 1600).rotateX(-Math.PI / 2).translate(0, -0.05, 0), M.sand, 0, 0, 0, { cast: false });
+  {
+    const g = new THREE.PlaneGeometry(170, 120).rotateX(-Math.PI / 2);
+    const uv = g.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * 170, uv.getY(i) * 120);
+    mesh(g, M.paving, 25, 0.01, 0, { cast: false });
+  }
+  // 안뜰 담: 다듬은 돌 세 켜 + 백향목 한 켜 (왕상 6:36)
+  const CW = { x0: -60, x1: 110, z0: -60, z1: 60, t: 1.5 };
+  const courtWall = (x0, x1, z0, z1) => {
+    B(x0, x1, 0, 3, z0, z1, M.stone, { collide: true });
+    B(x0, x1, 3, 4, z0, z1, M.cedar, { collide: true });
+  };
+  courtWall(CW.x0, CW.x1, CW.z0, CW.z0 + CW.t);
+  courtWall(CW.x0, CW.x1, CW.z1 - CW.t, CW.z1);
+  courtWall(CW.x0, CW.x0 + CW.t, CW.z0, CW.z1);
+  courtWall(CW.x1 - CW.t, CW.x1, CW.z0, -9);
+  courtWall(CW.x1 - CW.t, CW.x1, 9, CW.z1);
+  B(CW.x1 - 2.5, CW.x1 + 1, 0, 7, -11, -9, M.stone, { collide: true });
+  B(CW.x1 - 2.5, CW.x1 + 1, 0, 7, 9, 11, M.stone, { collide: true });
+  B(CW.x1 - 2.5, CW.x1 + 1, 7, 8, -11, 11, M.cedar);
+
+  /* ---------- 성전 본채 ---------- */
+  // 내부: 지성소 x -30..-10, 칸막이 -10..-9, 성소 -9..30, 앞벽 30..33, 낭실 33..43
+  const H = 30;
+  const winHoles = []; for (let x = -26; x <= 26; x += 8) winHoles.push([x - 1, x + 1, 19.5, 25.5]);
+
+  // 남·북 벽: 층마다 1규빗씩 들인 턱 (왕상 6:6)
+  for (const s of [1, -1]) {
+    const isSouth = s === 1;
+    const sec = isSouth ? { section: true } : {};
+    const inner = isSouth ? 'nz' : 'pz';
+    const zA = [10 * s, 11 * s].sort((a, b) => a - b);
+    // 안쪽 층(A): 바닥~지붕, 높은 창 (왕상 6:4)
+    wallPieces(-30, 30, 0, H, winHoles).forEach(([a, b, y0, y1]) => {
+      const m = new THREE.Mesh(boxGeo(a, b, y0, y1, zA[0], zA[1]), faces(M.stone, { [inner]: M.relief }));
+      world.add(flags(m, { collide: true, ...sec }));
+    });
+    const zB = [11 * s, 12 * s].sort((a, b) => a - b), zC = [12 * s, 13 * s].sort((a, b) => a - b);
+    B(-33, 30, 0, 10.6, zB[0], zB[1], M.stone, { collide: true, ...sec });
+    B(-33, 30, 0, 5.3, zC[0], zC[1], M.stone, { collide: true, ...sec });
+    // 창틀(좁은 창살)
+    winHoles.forEach(([a, b, y0, y1]) => {
+      for (let k = 1; k < 3; k++) B(a + k * (b - a) / 3 - .08, a + k * (b - a) / 3 + .08, y0, y1, zA[0] + .3, zA[1] - .3, M.cedar, sec);
+    });
+  }
+  // 서쪽 벽 (지성소 뒤)
+  B(-31, -30, 0, H, -11, 11, faces(M.stone, { px: M.relief }), { collide: true });
+  B(-32, -31, 0, 10.6, -12, 12, M.stone, { collide: true });
+  B(-33, -32, 0, 5.3, -13, 13, M.stone, { collide: true });
+  // 앞(동)벽: 입구 (왕상 6:33–34)
+  wallPieces(-13, 13, 0, H, [[-4, 4, 0, 14]]).forEach(([a, b, y0, y1]) => {
+    const m = new THREE.Mesh(boxGeo(30, 33, y0, y1, a, b), faces(M.stone, { nx: M.relief }));
+    world.add(flags(m, { collide: true, section: true }));
+  });
+  // 감람나무 문설주
+  B(29.6, 33.2, 0, 14.3, -4.4, -4, M.gold); B(29.6, 33.2, 0, 14.3, 4, 4.4, M.gold); B(29.6, 33.2, 14, 14.5, -4.4, 4.4, M.gold);
+  // 잣나무 문 두 짝(각 두 쪽 접이) — 안쪽으로 열린 상태
+  for (const s of [1, -1]) {
+    const z0 = s > 0 ? 4.5 : -8.5;
+    B(29.55, 29.95, 0.05, 13.8, z0, z0 + 2, M.relief, { collide: true });
+    B(29.15, 29.55, 0.05, 13.8, z0 + (s > 0 ? 2 : 0), z0 + (s > 0 ? 4 : 2), M.relief, { collide: true });
+  }
+  // 칸막이 벽(내소 앞): 입구 z -3..3, 높이 8
+  wallPieces(-10, 10, 0, H, [[-3, 3, 0, 8]]).forEach(([a, b, y0, y1]) => {
+    const m = new THREE.Mesh(boxGeo(-10, -9, y0, y1, a, b), faces(M.stone, { px: M.relief, nx: M.relief }));
+    world.add(flags(m, { collide: true, section: y0 >= 20 }));
+  });
+  B(-10.2, -8.8, 0, 8.3, -3.3, -3, M.gold); B(-10.2, -8.8, 0, 8.3, 3, 3.3, M.gold); B(-10.2, -8.8, 8, 8.4, -3.3, 3.3, M.gold);
+  // 감람나무 문 두 짝 (왕상 6:31–32) — 지성소 쪽으로 열림
+  B(-11.4, -10, 0.05, 7.9, 3.1, 3.4, M.relief, { collide: true });
+  B(-11.4, -10, 0.05, 7.9, -3.4, -3.1, M.relief, { collide: true });
+  // 휘장 (대하 3:14) — 양옆으로 걷어 놓음
+  for (const s of [1, -1]) {
+    const g = new THREE.CylinderGeometry(0.9, 1.1, 8.6, 18, 1, true, 0, Math.PI * 2);
+    const v = mesh(g, M.veil, -8.4, 4.3, s * 4.6, { section: true, collide: true });
+    v.scale.set(0.45, 1, 1);
+  }
+  B(-8.5, -8.3, 8.6, 8.8, -6, 6, M.gold, { section: true });
+  // 금 사슬 (왕상 6:21)
+  {
+    const links = 70, g = new THREE.TorusGeometry(0.16, 0.05, 6, 10);
+    const chain = new THREE.InstancedMesh(g, M.gold, links); const o = new THREE.Object3D();
+    for (let i = 0; i < links; i++) {
+      const t = i / (links - 1), z = -9.5 + t * 19, y = 12 - Math.sin(t * Math.PI) * 1.6;
+      o.position.set(-8.7, y, z); o.rotation.set(0, i % 2 ? Math.PI / 2 : 0, Math.PI / 2); o.updateMatrix(); chain.setMatrixAt(i, o.matrix);
+    }
+    world.add(chain); sectionObjs.push(chain);
+  }
+  // 바닥 (잣나무 판에 금, 왕상 6:15, 30)
+  B(-30, 30, 0, 0.15, -10, 10, M.goldFloor, { cast: false });
+  // 지성소 천장 (20규빗) 과 위쪽 공간
+  B(-30, -10, 20, 20.6, -10, 10, faces(M.cedar, { ny: M.gold }), { roof: true, section: true });
+  // 성소 천장/지붕 (백향목 들보와 판, 왕상 6:9)
+  B(-33, 33, H, H + 1.2, -13, 13, faces(M.stone, { ny: M.cedar }), { roof: true, section: true });
+  for (let x = -28; x <= 28; x += 4) B(x - .4, x + .4, H - 0.8, H, -10, 10, M.cedar, { roof: true, section: true, cast: false });
+  B(-33.5, 43.5, H + 1.2, H + 1.8, -13.5, 13.5, M.stoneDark, { roof: true, section: true });
+
+  // 낭실 (왕상 6:3): 옆벽과 지붕
+  for (const s of [1, -1]) {
+    const z = [10 * s, 13 * s].sort((a, b) => a - b);
+    B(33, 43, 0, H, z[0], z[1], M.stone, { collide: true, section: s === 1 });
+  }
+  B(33, 43, 0, 0.6, -10, 10, M.stone);
+  B(33, 43, H, H + 1.2, -13, 13, faces(M.stone, { ny: M.cedar }), { roof: true, section: true });
+  // 낭실 상인방
+  B(41.5, 43, 24, H, -10, 10, M.stone, { section: true });
+
+  /* ---------- 곁방 3층 (왕상 6:5–10) ---------- */
+  const floors = [[0, 5], [5.3, 10.3], [10.6, 15.6]];
+  for (const s of [1, -1]) {
+    const isSouth = s === 1;
+    const zo = [18 * s, 19 * s].sort((a, b) => a - b);
+    wallPieces(-40, 30, 0, 16.2, isSouth ? [[4.5, 7.5, 0, 4.6]] : []).forEach(([a, b, y0, y1]) => B(a, b, y0, y1, zo[0], zo[1], M.stone, { collide: true, section: isSouth }));
+    B(30, 33, 0, 16.2, Math.min(13 * s, 19 * s), Math.max(13 * s, 19 * s), M.stone, { collide: true });
+    // 층 바닥/지붕
+    [[5, 5.3, 12], [10.3, 10.6, 11], [15.6, 16.6, 11]].forEach(([y0, y1, zi]) => {
+      const z = [zi * s, 18 * s].sort((a, b) => a - b);
+      B(-33, 30, y0, y1, z[0], z[1], M.cedar, { roof: true, section: isSouth });
+    });
+    // 칸막이 (가정: 약 7규빗 간격)
+    for (let x = -26; x < 30; x += 7) B(x - .3, x + .3, 0, 15.6, Math.min(13 * s, 18 * s), Math.max(13 * s, 18 * s), M.stoneDark, { collide: true, section: isSouth && x > -20 });
+  }
+  // 서쪽 곁방
+  B(-40, -39, 0, 16.2, -19, 19, M.stone, { collide: true });
+  [[5, 5.3, -33], [10.3, 10.6, -32], [15.6, 16.6, -32]].forEach(([y0, y1, xi]) => B(-39, xi, y0, y1, -18, 18, M.cedar, { roof: true }));
+  for (let z = -12; z <= 12; z += 8) B(-39, -33, 0, 15.6, z - .3, z + .3, M.stoneDark, { collide: true });
+  // 남쪽 문 앞 나선 층계를 암시하는 문틀 (6:8)
+  B(4.1, 7.9, 4.6, 5.1, 18.8, 19.4, M.cedar, { section: true });
+
+  /* ---------- 야긴과 보아스 (왕상 7:15–22) ---------- */
+  function pillar(z, name) {
+    const g = new THREE.Group(); g.position.set(46, 0, z); world.add(g);
+    const r = 12 / (2 * Math.PI);
+    flags(mesh(new THREE.CylinderGeometry(r * 1.25, r * 1.35, 0.8, 40), M.bronze, 0, 0.4, 0, {}, g));
+    const shaft = mesh(new THREE.CylinderGeometry(r, r, 18, 48), M.bronze, 0, 9, 0, {}, g);
+    shaft.material = M.bronze.clone(); shaft.material.map = M.bronze.map.clone(); shaft.material.map.repeat.set(3, 3); shaft.material.map.needsUpdate = true;
+    // 기둥 머리: 둥근 그릇 + 백합화 (5규빗)
+    const prof = [[r, 0], [r * 1.12, .4], [r * 1.38, 1.3], [r * 1.42, 2.1], [r * 1.25, 2.7], [r * 1.1, 2.9], [r * 1.25, 3.4], [r * 1.6, 4.4], [r * 1.75, 5], [0.1, 5]].map(([a, b]) => new THREE.Vector2(a, b));
+    mesh(new THREE.LatheGeometry(prof, 48), M.bronze, 0, 18, 0, {}, g);
+    // 그물 · 사슬
+    for (let k = 0; k < 7; k++) mesh(new THREE.TorusGeometry(r * 1.4, 0.06, 6, 48).rotateX(Math.PI / 2), M.bronze, 0, 18.6 + k * 0.22, 0, { cast: false }, g);
+    // 석류 두 줄 (200개)
+    const pg = new THREE.SphereGeometry(0.2, 8, 6), pm = new THREE.InstancedMesh(pg, M.bronze, 200), o = new THREE.Object3D();
+    for (let i = 0; i < 200; i++) {
+      const row = i < 100 ? 0 : 1, a = (i % 100) / 100 * Math.PI * 2 + row * 0.03;
+      o.position.set(Math.cos(a) * r * 1.45, 18.45 + row * 1.7, Math.sin(a) * r * 1.45); o.updateMatrix(); pm.setMatrixAt(i, o.matrix);
+    }
+    pm.castShadow = true; g.add(pm);
+    // 백합 꽃잎
+    for (let k = 0; k < 12; k++) {
+      const a = k / 12 * Math.PI * 2;
+      const petal = mesh(new THREE.SphereGeometry(0.7, 10, 8), M.bronze, Math.cos(a) * r * 1.5, 22.5, Math.sin(a) * r * 1.5, {}, g);
+      petal.scale.set(0.35, 1.2, 0.7); petal.rotation.y = -a;
+    }
+    colliders.push(shaft);
+    g.userData.name = name;
+  }
+  pillar(6, '야긴'); pillar(-6, '보아스');
+
+  /* ---------- 번제단 (대하 4:1) ---------- */
+  {
+    const cx = 70;
+    B(cx - 10, cx + 10, 0, 4, -10, 10, M.altar, { collide: true });
+    B(cx - 9, cx + 9, 4, 4.5, -9, 9, M.bronze);
+    B(cx - 8.5, cx + 8.5, 4.5, 7, -8.5, 8.5, M.altar, { collide: true });
+    B(cx - 7.5, cx + 7.5, 7, 9.6, -7.5, 7.5, M.altar, { collide: true });
+    B(cx - 6.6, cx + 6.6, 9.4, 9.8, -6.6, 6.6, M.ash, { cast: false });
+    // 그물 격자 띠
+    for (let y = 5; y < 7; y += .5) B(cx - 8.6, cx + 8.6, y, y + .08, -8.6, 8.6, M.bronze, { cast: false });
+    // 네 뿔
+    for (const sx of [-1, 1]) for (const sz of [-1, 1]) {
+      const h = mesh(new THREE.ConeGeometry(0.9, 2.2, 4), M.altar, cx + sx * 6.9, 10.7, sz * 6.9);
+      h.rotation.y = Math.PI / 4;
+    }
+    // 남쪽 경사로 (가정)
+    const sh = new THREE.Shape(); sh.moveTo(8.5, 0); sh.lineTo(30, 0); sh.lineTo(8.5, 7); sh.lineTo(8.5, 0);
+    const rg = new THREE.ExtrudeGeometry(sh, { depth: 8, bevelEnabled: false });
+    const ramp = mesh(rg, M.stoneDark, cx + 4, 0, 0, { collide: true });
+    ramp.rotation.y = -Math.PI / 2;
+    // 숯과 장작
+    for (let i = 0; i < 26; i++) {
+      const l = mesh(new THREE.CylinderGeometry(.25, .25, 3 + rnd() * 2, 6), M.ash, cx - 4 + rnd() * 8, 10, -4 + rnd() * 8);
+      l.rotation.set(Math.PI / 2, 0, rnd() * Math.PI);
+    }
+  }
+
+  /* ---------- 놋 바다 (왕상 7:23–26) ---------- */
+  {
+    const g = new THREE.Group(); g.position.set(50, 0, 30); world.add(g);
+    const base = 2.9;
+    const prof = [[0.01, 0], [3.6, 0.15], [4.4, 1.2], [4.85, 2.8], [5, 4.3], [5.5, 5], [5.25, 5], [4.75, 4.4], [4.6, 2.8], [4.15, 1.3], [3.4, 0.4], [0.01, 0.35]].map(([a, b]) => new THREE.Vector2(a, b));
+    flags(mesh(new THREE.LatheGeometry(prof, 64), M.bronze, 0, base, 0, { collide: true }, g));
+    mesh(new THREE.CircleGeometry(4.65, 48).rotateX(-Math.PI / 2), M.water, 0, base + 4.3, 0, { cast: false }, g);
+    // 박 장식 두 줄 (7:24)
+    for (const row of [0, 1]) {
+      const n = 60, im = new THREE.InstancedMesh(new THREE.SphereGeometry(.17, 6, 5), M.bronze, n), o = new THREE.Object3D();
+      for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2 + row * .05; o.position.set(Math.cos(a) * 5.02, base + 3.6 - row * .55, Math.sin(a) * 5.02); o.updateMatrix(); im.setMatrixAt(i, o.matrix); }
+      g.add(im);
+    }
+    // 소 열두 마리, 셋씩 북·서·남·동 (7:25)
+    const ox = () => {
+      const o = new THREE.Group();
+      const bodyM = M.bronze;
+      const add = (geo, x, y, z) => { const m = new THREE.Mesh(geo, bodyM); m.position.set(x, y, z); m.castShadow = true; o.add(m); return m; };
+      add(new THREE.BoxGeometry(1.0, 1.1, 2.6), 0, 1.75, 0).geometry.translate(0, 0, 0);
+      add(new THREE.BoxGeometry(0.75, 0.8, 0.9), 0, 2.05, 1.65);
+      add(new THREE.BoxGeometry(0.55, 0.5, 0.5), 0, 1.85, 2.2);
+      for (const sx of [-.3, .3]) for (const sz of [-.95, .95]) add(new THREE.BoxGeometry(.25, 1.3, .25), sx, .65, sz);
+      for (const sx of [-1, 1]) { const h = add(new THREE.ConeGeometry(.09, .55, 6), sx * .38, 2.55, 1.6); h.rotation.z = -sx * .9; }
+      return o;
+    };
+    for (let d = 0; d < 4; d++) for (let k = -1; k <= 1; k++) {
+      const a = d * Math.PI / 2 + k * 0.42; const o = ox();
+      o.position.set(Math.sin(a) * 3.3, 0, Math.cos(a) * 3.3); o.rotation.y = a; g.add(o);
+    }
+  }
+
+  /* ---------- 물두멍과 받침 수레 열 개 (왕상 7:27–39) ---------- */
+  function stand(x, z) {
+    const g = new THREE.Group(); g.position.set(x, 0, z); world.add(g);
+    for (const sx of [-1, 1]) for (const sz of [-1, 1]) {
+      const w = mesh(new THREE.CylinderGeometry(.75, .75, .18, 20).rotateX(Math.PI / 2), M.bronze, sx * 1.6, .75, sz * 2.1, {}, g);
+      w.rotation.y = 0;
+    }
+    mesh(new THREE.CylinderGeometry(.08, .08, 4.4, 8).rotateX(Math.PI / 2), M.bronze, 1.6, .75, 0, {}, g);
+    mesh(new THREE.CylinderGeometry(.08, .08, 4.4, 8).rotateX(Math.PI / 2), M.bronze, -1.6, .75, 0, {}, g);
+    const frame = mesh(new THREE.BoxGeometry(4, 2.4, 4), M.bronze, 0, 2.4, 0, { collide: true }, g);
+    // 옆판 무늬: 사자·소·그룹 대신 돋을새김 띠
+    for (const s of [-1, 1]) { mesh(new THREE.BoxGeometry(4.12, .18, 4.12), M.gold, 0, 1.4 + (s + 1) * 1.0, 0, { cast: false }, g); }
+    for (const sx of [-1, 1]) for (const sz of [-1, 1]) mesh(new THREE.BoxGeometry(.3, 2.6, .3), M.bronze, sx * 2, 2.4, sz * 2, {}, g);
+    mesh(new THREE.CylinderGeometry(1, 1.2, .5, 24), M.bronze, 0, 3.85, 0, {}, g);
+    const prof = [[0.01, 0], [1, .1], [1.7, .6], [2, 1.3], [1.85, 1.3], [1.55, .7], [.9, .25], [.01, .2]].map(([a, b]) => new THREE.Vector2(a, b));
+    mesh(new THREE.LatheGeometry(prof, 40), M.bronze, 0, 4.1, 0, {}, g);
+    mesh(new THREE.CircleGeometry(1.75, 24).rotateX(-Math.PI / 2), M.water, 0, 5.15, 0, { cast: false }, g);
+    return frame;
+  }
+  for (const s of [1, -1]) for (let i = 0; i < 5; i++) stand(-4 + i * 9, s * 27);
+
+  /* ---------- 성소 기물 ---------- */
+  // 등잔대 10개 (왕상 7:49)
+  const lampSingle = [], lampSeven = [], flames = [];
+  const flameTex = (() => {
+    const c = canvas(64, 64, (g) => { const r = g.createRadialGradient(32, 32, 0, 32, 32, 32); r.addColorStop(0, 'rgba(255,248,210,1)'); r.addColorStop(.3, 'rgba(255,190,80,.9)'); r.addColorStop(1, 'rgba(255,90,10,0)'); g.fillStyle = r; g.fillRect(0, 0, 64, 64); });
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+  })();
+  const flameMat = new THREE.SpriteMaterial({ map: flameTex, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true });
+  function flame(parent, x, y, z, s = .6) {
+    const f = new THREE.Sprite(flameMat); f.position.set(x, y, z); f.scale.set(s, s * 1.4, s); parent.add(f); flames.push(f); return f;
+  }
+  function lampstand(x, z) {
+    const g = new THREE.Group(); g.position.set(x, 0.15, z); world.add(g);
+    mesh(new THREE.CylinderGeometry(.25, .7, .5, 16), M.gold, 0, .25, 0, {}, g);
+    mesh(new THREE.CylinderGeometry(.1, .14, 3.1, 12), M.gold, 0, 1.9, 0, {}, g);
+    for (let k = 0; k < 4; k++) mesh(new THREE.SphereGeometry(.17, 10, 8), M.gold, 0, .9 + k * .7, 0, {}, g);
+    const single = new THREE.Group(); g.add(single);
+    mesh(new THREE.CylinderGeometry(.45, .18, .3, 18), M.gold, 0, 3.55, 0, {}, single);
+    flame(single, 0, 3.95, 0, .7);
+    const seven = new THREE.Group(); seven.visible = false; g.add(seven);
+    mesh(new THREE.CylinderGeometry(.1, .1, 1.3, 10), M.gold, 0, 3.95, 0, {}, seven);
+    [0.45, 0.85, 1.25].forEach((r) => {
+      const arc = mesh(new THREE.TorusGeometry(r, .07, 8, 24, Math.PI), M.gold, 0, 3.3, 0, {}, seven);
+      arc.rotation.set(0, 0, Math.PI);
+      for (const s of [-1, 1]) mesh(new THREE.CylinderGeometry(.07, .07, 1.3, 8), M.gold, s * r, 3.95, 0, {}, seven);
+    });
+    [0, -.45, .45, -.85, .85, -1.25, 1.25].forEach((xx) => {
+      mesh(new THREE.CylinderGeometry(.2, .1, .18, 12), M.gold, xx, 4.65, 0, {}, seven);
+      flame(seven, xx, 4.95, 0, .5);
+    });
+    seven.rotation.y = 0;
+    lampSingle.push(single); lampSeven.push(seven);
+    colliders.push(g.children[1]);
+    // 걷기 충돌용 받침
+    const c = new THREE.Mesh(new THREE.BoxGeometry(1.2, 4, 1.2)); c.position.set(x, 2, z); c.visible = false; world.add(c); colliders.push(c);
+  }
+  for (const s of [1, -1]) for (let i = 0; i < 5; i++) lampstand(-4 + i * 5.5, s * 7.5);
+
+  // 진설병 상: 기본 1개 (왕상 7:48) / 비교 10개 (대하 4:8)
+  function table(x, z) {
+    const g = new THREE.Group(); g.position.set(x, .15, z); world.add(g);
+    mesh(new THREE.BoxGeometry(1, .12, 2), M.gold, 0, 1.45, 0, {}, g);
+    mesh(new THREE.BoxGeometry(.9, .2, 1.9), M.gold, 0, 1.3, 0, {}, g);
+    for (const sx of [-1, 1]) for (const sz of [-1, 1]) mesh(new THREE.BoxGeometry(.1, 1.4, .1), M.gold, sx * .42, .7, sz * .92, {}, g);
+    for (const sx of [-.22, .22]) for (let k = 0; k < 6; k++) mesh(new THREE.CylinderGeometry(.18, .2, .1, 14), M.bread, sx, 1.57 + k * .1, 0, {}, g);
+    const c = new THREE.Mesh(new THREE.BoxGeometry(1.2, 2, 2.2)); c.position.set(x, 1, z); c.visible = false; world.add(c);
+    g.userData.collider = c;
+    return g;
+  }
+  const oneTable = [table(10, -3.5)];
+  const tenTables = [];
+  for (const s of [1, -1]) for (let i = 0; i < 5; i++) tenTables.push(table(-1.5 + i * 5.5, s * 4.2));
+
+  // 분향하는 금 제단 (왕상 6:22; 7:48)
+  {
+    const g = new THREE.Group(); g.position.set(-5, .15, 0); world.add(g);
+    mesh(new THREE.BoxGeometry(1, 2, 1), M.gold, 0, 1, 0, { collide: true }, g);
+    mesh(new THREE.BoxGeometry(1.15, .12, 1.15), M.gold, 0, 2, 0, {}, g);
+    for (const sx of [-1, 1]) for (const sz of [-1, 1]) mesh(new THREE.ConeGeometry(.1, .3, 4), M.gold, sx * .45, 2.2, sz * .45, {}, g);
+    // 향 연기
+  }
+
+  /* ---------- 지성소: 언약궤와 두 그룹 ---------- */
+  {
+    const g = new THREE.Group(); g.position.set(-20, .15, 0); world.add(g);
+    mesh(new THREE.BoxGeometry(1.5, 1.5, 2.5), M.gold, 0, .75, 0, { collide: true }, g);
+    mesh(new THREE.BoxGeometry(1.6, .12, 2.6), M.gold, 0, 1.56, 0, {}, g);
+    for (const s of [1, -1]) mesh(new THREE.CylinderGeometry(.07, .07, 9, 8).rotateZ(Math.PI / 2), M.gold, 0, .55, s * 1.0, {}, g);
+    // 속죄소의 작은 그룹 (출 25:18–20)
+    for (const s of [1, -1]) {
+      mesh(new THREE.CylinderGeometry(.12, .18, .55, 10), M.gold, 0, 1.9, s * 1.0, {}, g);
+      const w = mesh(new THREE.BoxGeometry(.6, .05, .7), M.gold, 0, 2.15, s * .6, {}, g); w.rotation.x = s * .5;
+    }
+  }
+  // 큰 그룹 (왕상 6:23–28): 높이 10, 날개 각 5, 동쪽을 향함 (대하 3:13)
+  function wingGeo() {
+    const sh = new THREE.Shape();
+    sh.moveTo(0, -0.5); sh.quadraticCurveTo(2.5, 1.6, 5, 1.1);
+    sh.lineTo(5, 0.7);
+    for (let i = 0; i < 7; i++) { const x = 5 - i * 0.7; sh.quadraticCurveTo(x - .2, -.9 - i * .12, x - .7, .2 - i * .1); }
+    sh.lineTo(0, -1.6); sh.lineTo(0, -0.5);
+    return new THREE.ExtrudeGeometry(sh, { depth: .22, bevelEnabled: true, bevelSize: .05, bevelThickness: .05, bevelSegments: 1 });
+  }
+  const wg = wingGeo();
+  function cherub(z) {
+    const g = new THREE.Group(); g.position.set(-20, .15, z); world.add(g);
+    mesh(new THREE.CylinderGeometry(.9, 1.3, 5.6, 20), M.gold, 0, 2.8, 0, { collide: true }, g);
+    mesh(new THREE.CylinderGeometry(.75, .9, 2.4, 20), M.gold, 0, 6.8, 0, {}, g);
+    mesh(new THREE.SphereGeometry(.7, 20, 16), M.gold, 0, 8.7, 0, {}, g);
+    mesh(new THREE.SphereGeometry(.4, 12, 10), M.gold, .55, 8.6, 0, {}, g);
+    for (const side of [1, -1]) {
+      const w = new THREE.Mesh(wg, M.gold); w.castShadow = true;
+      w.rotation.y = -Math.PI / 2; w.position.set(.1, 8.1, 0);
+      w.scale.set(1, 1, 1);
+      if (side < 0) { w.scale.x = -1; }
+      g.add(w);
+    }
+    // 아래로 모은 두 팔
+    for (const s of [1, -1]) { const a = mesh(new THREE.CylinderGeometry(.18, .2, 2.2, 10), M.gold, .55, 6.3, s * .8, {}, g); a.rotation.z = .5; }
+  }
+  cherub(5); cherub(-5);
+
+  /* ---------- 빛 ---------- */
+  const hemi = new THREE.HemisphereLight(0xf6ead2, 0x5a4a35, 0.55); scene.add(hemi);
+  const sun = new THREE.DirectionalLight(0xffe8c8, 2.2);
+  sun.position.set(130, 170, 95); sun.target.position.set(15, 0, 0); scene.add(sun, sun.target);
+  sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+  Object.assign(sun.shadow.camera, { left: -120, right: 120, top: 120, bottom: -120, near: 10, far: 500 });
+  sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.6;
+  const studyLights = new THREE.Group(); scene.add(studyLights);
+  [[18, 22, 0, 160], [0, 14, 0, 110], [-20, 14, 0, 140], [-20, 4, 6, 40], [38, 18, 0, 60], [5, 12, 15.5, 40]].forEach(([x, y, z, i]) => {
+    const l = new THREE.PointLight(0xffe2b0, i, 70, 1.4); l.position.set(x, y, z); studyLights.add(l);
+  });
+  const studyAmb = new THREE.AmbientLight(0xfff3dd, 0.35); studyLights.add(studyAmb);
+
+  /* ---------- 불과 연기 ---------- */
+  const fireGroup = new THREE.Group(); scene.add(fireGroup);
+  const fireLight = new THREE.PointLight(0xff8a30, 40, 40, 1.6); fireLight.position.set(70, 13, 0); fireGroup.add(fireLight);
+  const smokeTex = (() => {
+    const c = canvas(64, 64, (g) => { const r = g.createRadialGradient(32, 32, 0, 32, 32, 32); r.addColorStop(0, 'rgba(90,85,80,.55)'); r.addColorStop(1, 'rgba(90,85,80,0)'); g.fillStyle = r; g.fillRect(0, 0, 64, 64); });
+    return new THREE.CanvasTexture(c);
+  })();
+  const parts = [];
+  for (let i = 0; i < 60; i++) {
+    const fire = i < 34;
+    const m = new THREE.SpriteMaterial({ map: fire ? flameTex : smokeTex, blending: fire ? THREE.AdditiveBlending : THREE.NormalBlending, depthWrite: false, transparent: true });
+    const s = new THREE.Sprite(m); fireGroup.add(s);
+    parts.push({ s, fire, t: rnd(), life: fire ? .9 + rnd() * .6 : 4 + rnd() * 3, x: 70 + (rnd() - .5) * 11, z: (rnd() - .5) * 11 });
+  }
+  function updateFire(dt, time) {
+    parts.forEach((p) => {
+      p.t += dt / p.life; if (p.t > 1) { p.t = 0; p.x = 70 + (rnd() - .5) * 11; p.z = (rnd() - .5) * 11; }
+      const k = p.t;
+      if (p.fire) {
+        p.s.position.set(p.x + Math.sin(time * 5 + p.z) * .2, 9.9 + k * 4, p.z);
+        const sc = (1 - k) * 3.2 + .4; p.s.scale.set(sc, sc * 1.5, sc); p.s.material.opacity = (1 - k);
+      } else {
+        p.s.position.set(p.x + k * 6, 12 + k * 26, p.z + Math.sin(k * 6 + p.x) * 2);
+        const sc = 3 + k * 12; p.s.scale.set(sc, sc, sc); p.s.material.opacity = Math.sin(k * Math.PI) * .55;
+      }
+    });
+    fireLight.intensity = 34 + Math.sin(time * 13) * 6 + Math.sin(time * 7.3) * 5;
+    flames.forEach((f, i) => { const s = .9 + Math.sin(time * 9 + i) * .08; f.scale.y = f.scale.x * 1.4 * s; });
+  }
+
+  /* ---------- 표시 상태 적용 ---------- */
+  function applyVisibility() {
+    const walk = state.mode === 'walk';
+    const plan = state.mode === 'plan';
+    sectionObjs.forEach((o) => (o.visible = !(state.section && !walk)));
+    roofObjs.forEach((o) => { if (plan) o.visible = false; else if (!sectionObjs.includes(o)) o.visible = true; });
+    if (plan) sectionObjs.forEach((o) => { if (o.material === M.veil) o.visible = false; });
+    $('#sectionNote').hidden = !(state.section && !walk);
+    setPressed('#sectionBtn', state.section);
+  }
+  function setPressed(sel, on, onText, offText) {
+    const b = $(sel); b.setAttribute('aria-pressed', on);
+    if (onText) b.textContent = on ? onText : offText;
+  }
+  function applyCompare() {
+    oneTable.forEach((t) => (t.visible = !state.compare));
+    tenTables.forEach((t) => (t.visible = state.compare));
+    $('#compareNote').hidden = !state.compare;
+    setPressed('#compareBtn', state.compare);
+  }
+  function applyLamps() {
+    lampSingle.forEach((g) => (g.visible = !state.seven));
+    lampSeven.forEach((g) => (g.visible = state.seven));
+    setPressed('#lampBtn', state.seven, '등잔: 일곱 가지 비교', '등잔: 형태 미상');
+  }
+
+  $('#sectionBtn').onclick = () => { state.section = !state.section; applyVisibility(); };
+  $('#labelBtn').onclick = () => { state.labels = !state.labels; $('#markers').classList.toggle('showLabels', state.labels); setPressed('#labelBtn', state.labels); };
+  $('#renderBtn').onclick = () => {
+    state.natural = !state.natural; sun.castShadow = state.natural; scene.environment = state.natural ? envTex : null;
+    setPressed('#renderBtn', state.natural, '자연광 표현 켜짐', '자연광 표현 꺼짐');
+  };
+  $('#lightBtn').onclick = () => { state.study = !state.study; studyLights.visible = state.study; setPressed('#lightBtn', state.study, '학습 조명 켜짐', '학습 조명 꺼짐'); };
+  $('#lampBtn').onclick = () => { state.seven = !state.seven; applyLamps(); };
+  $('#fireBtn').onclick = () => { state.fire = !state.fire; fireGroup.visible = state.fire; setPressed('#fireBtn', state.fire, '불·연기 켜짐', '불·연기 꺼짐'); };
+  $('#compareBtn').onclick = () => { state.compare = !state.compare; applyCompare(); };
+
+  /* ---------- 번호 표지 ---------- */
+  const markerEls = PLACES.map((p, i) => {
+    const b = document.createElement('button'); b.className = 'marker';
+    b.innerHTML = `<span class="num">${i + 1}</span><span class="name">${p.name}</span>`;
+    b.setAttribute('aria-label', `${i + 1}. ${p.name}`);
+    b.onclick = () => select(i);
+    $('#markers').appendChild(b); return b;
+  });
+  const v3 = new THREE.Vector3();
+  function updateMarkers() {
+    const w = host.clientWidth, h = host.clientHeight;
+    markerEls.forEach((el, i) => {
+      v3.set(...PLACES[i].point).project(camera);
+      const hide = v3.z > 1 || state.mode === 'walk';
+      el.style.display = hide ? 'none' : '';
+      if (!hide) el.style.transform = `translate(${(v3.x * .5 + .5) * w}px, ${(-v3.y * .5 + .5) * h}px) translate(-15px,-15px)`;
+      el.style.left = '0'; el.style.top = '0';
+      el.classList.toggle('selected', i === state.index);
+    });
+  }
+
+  /* ---------- 카메라 이동 ---------- */
+  let tween = null;
+  function flyTo(pos, look, dur = 1.3) {
+    tween = { p0: camera.position.clone(), t0: controls.target.clone(), p1: new THREE.Vector3(...pos), t1: new THREE.Vector3(...look), k: 0, dur };
+  }
+  function stepTween(dt) {
+    if (!tween) return;
+    tween.k = Math.min(1, tween.k + dt / tween.dur);
+    const e = tween.k < .5 ? 4 * tween.k ** 3 : 1 - (-2 * tween.k + 2) ** 3 / 2;
+    camera.position.lerpVectors(tween.p0, tween.p1, e);
+    controls.target.lerpVectors(tween.t0, tween.t1, e);
+    if (tween.k >= 1) tween = null;
+  }
+
+  /* ---------- 보기 방식 ---------- */
+  const walk = { yaw: Math.PI / 2, pitch: 0, x: 100, z: 0, keys: new Set(), eye: 3.6, r: .7 };
+  function setMode(m) {
+    state.mode = m;
+    ['orbit', 'plan', 'walk'].forEach((k) => $(`#${k}Btn`).classList.toggle('active', k === m));
+    $('#walkPad').hidden = m !== 'walk';
+    controls.enabled = m !== 'walk';
+    controls.enableRotate = m === 'orbit';
+    controls.maxPolarAngle = m === 'plan' ? 0.02 : Math.PI / 2 - 0.03;
+    controls.mouseButtons.LEFT = m === 'plan' ? THREE.MOUSE.PAN : THREE.MOUSE.ROTATE;
+    controls.touches.ONE = m === 'plan' ? THREE.TOUCH.PAN : THREE.TOUCH.ROTATE;
+    $('#gesture').textContent = m === 'walk' ? 'W·A·S·D로 이동 · 화면을 끌어 둘러보기 · Esc로 나가기'
+      : m === 'plan' ? '드래그로 이동 · 스크롤로 확대 · 위에서 본 배치도' : '드래그로 회전 · 스크롤로 확대 · 번호를 눌러 탐험';
+    if (m !== 'walk' && document.pointerLockElement) document.exitPointerLock();
+    applyVisibility();
+  }
+  $('#orbitBtn').onclick = () => { setMode('orbit'); const p = PLACES[state.index]; state.section = p.section; applyVisibility(); flyTo(p.view, p.look); };
+  $('#planBtn').onclick = () => { setMode('plan'); controls.target.set(18, 0, 0); camera.position.set(18, 240, 0.5); tween = null; flyTo([18, 230, 0.5], [18, 0, 0], .01); };
+  $('#walkBtn').onclick = () => { enterWalk(PLACES[state.index].walk); };
+  $('#resetBtn').onclick = () => { if (state.mode === 'walk') enterWalk(PLACES[0].walk); else { setMode('orbit'); state.section = false; applyVisibility(); flyTo([125, 72, 118], [16, 0, 0]); } };
+  function enterWalk([x, z, yaw]) {
+    tween = null; setMode('walk');
+    walk.x = x; walk.z = z; walk.yaw = yaw; walk.pitch = 0;
+  }
+  document.querySelectorAll('[data-view]').forEach((b) => b.onclick = () => {
+    const c = CLOSEUPS[b.dataset.view];
+    if (state.mode !== 'orbit') setMode('orbit');
+    state.section = c.section; applyVisibility();
+    flyTo(c.pos, c.look, 1.5);
+  });
+
+  onSelect = (p, instant) => {
+    if (state.mode === 'walk') { enterWalk(p.walk); return; }
+    if (state.mode === 'plan') return;
+    state.section = p.section; applyVisibility();
+    if (instant) { camera.position.set(...p.view); controls.target.set(...p.look); }
+    else flyTo(p.view, p.look);
+  };
+
+  /* ---------- 걷기 ---------- */
+  const boxes = [];
+  function buildColliders() {
+    scene.updateMatrixWorld(true);
+    const b3 = new THREE.Box3();
+    colliders.forEach((o) => { b3.setFromObject(o, true); boxes.push(b3.clone()); });
+    tenTables.concat(oneTable).forEach((t) => boxes.push(Object.assign(new THREE.Box3().setFromObject(t.userData.collider), { table: t })));
+  }
+  function blocked(x, z) {
+    const r = walk.r;
+    for (const b of boxes) {
+      if (b.table && !b.table.visible) continue;
+      if (b.max.y < 0.7 || b.min.y > walk.eye + .3) continue;
+      if (x + r > b.min.x && x - r < b.max.x && z + r > b.min.z && z - r < b.max.z) return true;
+    }
+    return false;
+  }
+  const keyMap = { KeyW: 'f', ArrowUp: 'f', KeyS: 'b', ArrowDown: 'b', KeyA: 'l', KeyD: 'r' };
+  addEventListener('keydown', (e) => {
+    if (state.mode !== 'walk' || document.querySelector('dialog[open]')) return;
+    if (e.code === 'Escape' && !document.pointerLockElement) { setMode('orbit'); const p = PLACES[state.index]; state.section = p.section; applyVisibility(); flyTo(p.view, p.look); return; }
+    if (e.code === 'Home') { walk.pitch = 0; e.preventDefault(); return; }
+    walk.keys.add(e.code);
+    if (/Arrow|Page|Space/.test(e.code)) e.preventDefault();
+  });
+  addEventListener('keyup', (e) => walk.keys.delete(e.code));
+  addEventListener('blur', () => walk.keys.clear());
+  document.querySelectorAll('#walkPad [data-key]').forEach((b) => {
+    const k = b.dataset.key;
+    const on = (e) => { e.preventDefault(); if (k === 'Home') { walk.pitch = 0; return; } walk.keys.add(k); b.setPointerCapture?.(e.pointerId); };
+    const off = () => walk.keys.delete(k);
+    b.addEventListener('pointerdown', on); b.addEventListener('pointerup', off); b.addEventListener('pointercancel', off); b.addEventListener('lostpointercapture', off);
+    b.addEventListener('contextmenu', (e) => e.preventDefault());
+  });
+  $('#mouseLookBtn').onclick = () => renderer.domElement.requestPointerLock?.();
+  document.addEventListener('pointerlockchange', () => setPressed('#mouseLookBtn', !!document.pointerLockElement));
+  let drag = null;
+  renderer.domElement.addEventListener('pointerdown', (e) => { if (state.mode === 'walk' && !document.pointerLockElement) { drag = { x: e.clientX, y: e.clientY }; renderer.domElement.setPointerCapture(e.pointerId); } });
+  renderer.domElement.addEventListener('pointermove', (e) => {
+    if (state.mode !== 'walk') return;
+    let dx = 0, dy = 0;
+    if (document.pointerLockElement) { dx = e.movementX; dy = e.movementY; }
+    else if (drag) { dx = e.clientX - drag.x; dy = e.clientY - drag.y; drag = { x: e.clientX, y: e.clientY }; }
+    walk.yaw -= dx * 0.0035; walk.pitch = Math.max(-1.3, Math.min(1.3, walk.pitch - dy * 0.0035));
+  });
+  renderer.domElement.addEventListener('pointerup', () => (drag = null));
+  renderer.domElement.addEventListener('wheel', (e) => { if (state.mode === 'walk') e.preventDefault(); }, { passive: false });
+
+  function updateWalk(dt) {
+    const k = walk.keys;
+    const turn = 1.6 * dt;
+    if (k.has('ArrowLeft')) walk.yaw += turn;
+    if (k.has('ArrowRight')) walk.yaw -= turn;
+    if (k.has('KeyR') || k.has('PageUp')) walk.pitch = Math.min(1.3, walk.pitch + turn * .7);
+    if (k.has('KeyF') || k.has('PageDown')) walk.pitch = Math.max(-1.3, walk.pitch - turn * .7);
+    let f = 0, s = 0;
+    for (const c of k) { const a = keyMap[c]; if (a === 'f') f += 1; if (a === 'b') f -= 1; if (a === 'l') s -= 1; if (a === 'r') s += 1; }
+    if (f || s) {
+      const sp = (k.has('ShiftLeft') || k.has('ShiftRight') ? 16 : 8) * dt / Math.hypot(f, s);
+      const fx = -Math.sin(walk.yaw), fz = -Math.cos(walk.yaw), rx = Math.cos(walk.yaw), rz = -Math.sin(walk.yaw);
+      const dx = (fx * f + rx * s) * sp, dz = (fz * f + rz * s) * sp;
+      if (!blocked(walk.x + dx, walk.z)) walk.x += dx;
+      if (!blocked(walk.x, walk.z + dz)) walk.z += dz;
+    }
+    const bob = (f || s) ? Math.sin(performance.now() / 160) * .05 : 0;
+    camera.position.set(walk.x, walk.eye + bob, walk.z);
+    camera.rotation.set(walk.pitch, walk.yaw, 0, 'YXZ');
+  }
+
+  /* ---------- 크기 · 루프 ---------- */
+  function resize() {
+    const w = host.clientWidth, h = host.clientHeight;
+    renderer.setSize(w, h, false); camera.aspect = w / h;
+    camera.fov = w < 700 ? 62 : 50; camera.updateProjectionMatrix();
+  }
+  new ResizeObserver(resize).observe(host); resize();
+
+  applyVisibility(); applyCompare(); applyLamps();
+  buildColliders();
+  select(0, true);
+
+  const clock = new THREE.Clock(); let first = true;
+  renderer.setAnimationLoop(() => {
+    const raw = clock.getDelta(), dt = Math.min(raw, 0.05), t = clock.elapsedTime;
+    if (state.mode === 'walk') updateWalk(dt);
+    else { stepTween(Math.min(raw, 0.5)); controls.update(); }
+    if (state.fire) updateFire(dt, t);
+    updateMarkers();
+    renderer.render(scene, camera);
+    if (first) { first = false; $('#loading').hidden = true; }
+  });
+}
+
+</script>
+</body>
+</html>
